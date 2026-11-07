@@ -1,0 +1,200 @@
+<header class="navbar">
+  <a class="brand" href="#home">
+    <img src="/favicon.png" alt="HHM" class="brand-mark" />
+    <span class="brand-name">
+      Hampel Hospital<br>
+      Management
+    </span>
+  </a>
+
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#features">Features</a>
+    <a href="#benefits">Benefits</a>
+    <a href="#about">About</a>
+  </nav>
+
+  <a mat-stroked-button class="nav-button" href="/login">
+    <mat-icon>person_outline</mat-icon>
+    Access System
+    <mat-icon>arrow_forward</mat-icon>
+  </a>
+</header>
+
+<main>
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <span class="eyebrow">SMART HOSPITAL MANAGEMENT</span>
+
+      <h1>
+        <span class="accent">H</span>HM —Hampel<br>
+        Hospital Management
+      </h1>
+
+      <h3>
+        Technology, efficiency, and patient care
+        in one powerful platform.
+      </h3>
+
+      <p>
+        Streamline patient records, appointments, and hospital
+        operations with a modern, intuitive management system.
+      </p>
+
+      <div class="actions">
+        <a mat-flat-button class="primary-button" href="/login">
+          Access System
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+
+        <a mat-stroked-button class="secondary-button" href="#features">
+          Explore Features
+        </a>
+      </div>
+
+      <div class="hero-highlights">
+        <div>
+          <mat-icon>shield</mat-icon>
+          <span>Operational<br>Efficiency</span>
+        </div>
+
+        <div>
+          <mat-icon>bolt</mat-icon>
+          <span>Security<br>First</span>
+        </div>
+
+        <div>
+          <mat-icon>favorite_border</mat-icon>
+          <span>Patient-<br>Centered</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="dashboard">
+        <div class="dashboard-heading">
+          <strong>HH<span>M</span></strong>
+          <span>General Overview</span>
+        </div>
+
+        <div class="stats">
+          <div class="stat-card">
+            <small>Active Patients</small>
+            <strong>1,248</strong>
+            <span>+12%</span>
+          </div>
+
+          <div class="stat-card">
+            <small>Appointments Today</small>
+            <strong>328</strong>
+            <span>+6%</span>
+          </div>
+
+          <div class="stat-card">
+            <small>Admissions</small>
+            <strong>186</strong>
+            <span>+5%</span>
+          </div>
+        </div>
+
+        <div class="chart-placeholder">
+          <span>Appointments Overview</span>
+
+          <svg viewBox="0 0 500 140" preserveAspectRatio="none">
+            <polyline
+              points="0,90 50,65 100,105 150,75 200,85 250,30 300,60 350,45 400,70 450,20 500,40"
+              fill="none"
+              stroke="#4169e1"
+              stroke-width="3"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="section">
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">
+          EVERYTHING YOU NEED, ALL IN ONE PLACE
+        </span>
+
+        <h2>
+          <span class="accent">Simplify</span>
+          Hospital Operations
+        </h2>
+      </div>
+
+      <p>
+        A unified platform designed to streamline healthcare workflows,
+        improve operational efficiency, and keep your team focused
+        on what matters most.
+      </p>
+    </div>
+
+    <div class="feature-grid">
+      @for (feature of features; track feature.title) {
+        <article class="feature-card">
+          <div class="icon-box">
+            <mat-icon>{{ feature.icon }}</mat-icon>
+          </div>
+
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section id="benefits" class="section benefits">
+    <span class="eyebrow">BUILT FOR BETTER HEALTHCARE</span>
+
+    <h2>
+      Smarter Management.
+      <span class="accent">Better Care.</span>
+    </h2>
+
+    <div class="benefit-grid">
+      @for (benefit of benefits; track benefit.title) {
+        <article class="benefit-card">
+          <mat-icon>{{ benefit.icon }}</mat-icon>
+          <h3>{{ benefit.title }}</h3>
+          <p>{{ benefit.description }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section id="about" class="cta">
+    <div>
+      <h2>
+        More Than Software.<br>
+        A Better Way to Manage Healthcare.
+      </h2>
+
+      <p>
+        Experience a smarter approach to hospital management with HHM.
+      </p>
+    </div>
+
+    <a mat-flat-button class="primary-button" href="/login">
+      Get Started
+      <mat-icon>arrow_forward</mat-icon>
+    </a>
+  </section>
+</main>
+
+<footer>
+  <div class="brand">
+    <span class="brand-mark">HH<span>M</span></span>
+    <span class="brand-name">
+      Hampel Hospital<br>
+      Management
+    </span>
+  </div>
+
+  <p>Empowering Healthcare Through Technology.</p>
+
+  <span>© 2026 HHM. All rights reserved.</span>
+</footer>
