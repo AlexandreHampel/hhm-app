@@ -1,0 +1,29 @@
+
+<h1 data-testid="modules-title">HHM Modules</h1>
+
+<p data-testid="modules-description">
+  Select a module to continue.
+</p>
+
+<div class="modules-grid" data-testid="modules-grid">
+  <div
+    *ngFor="let module of modules"
+    class="module-card"
+    [attr.data-testid]="'modules-card-' + module.id">
+
+    <h2 [attr.data-testid]="'modules-name-' + module.id">
+      {{ module.name }}
+    </h2>
+
+    <p [attr.data-testid]="'modules-description-' + module.id">
+      {{ module.description }}
+    </p>
+
+    <a
+      [routerLink]="module.route"
+      [attr.data-testid]="'modules-open-' + module.id">
+      Open Module
+    </a>
+
+  </div>
+</div>
