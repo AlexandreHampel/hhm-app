@@ -9,6 +9,10 @@ import { App } from './app';
 import { Landing } from './pages/landing/landing';
 import { routes } from './app.routes';
 
+import { ReactiveFormsModule } from '@angular/forms';
+import { provideHttpClient } from '@angular/common/http';
+import { Patients } from './pages/patients/patients';
+
 @NgModule({
   declarations: [
     App,

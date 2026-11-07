@@ -1,0 +1,109 @@
+<h1>Patients</h1>
+
+<hr>
+
+<h2>{{ editingId ? 'Edit Patient' : 'Create Patient' }}</h2>
+
+<form [formGroup]="patientForm" (ngSubmit)="save()">
+
+  <div>
+    <label for="name">Name:</label>
+    <input id="name" type="text" formControlName="name">
+  </div>
+
+  <div>
+    <label for="cpf">CPF:</label>
+    <input id="cpf" type="text" formControlName="cpf">
+  </div>
+
+  <div>
+    <label for="birthDate">Birth Date:</label>
+    <input id="birthDate" type="date" formControlName="birthDate">
+  </div>
+
+  <div>
+    <label for="email">Email:</label>
+    <input id="email" type="email" formControlName="email">
+  </div>
+
+  <div>
+    <label for="phone">Phone:</label>
+    <input id="phone" type="text" formControlName="phone">
+  </div>
+
+  <br>
+
+  <button
+    type="submit"
+    [disabled]="patientForm.invalid || loading">
+    {{ editingId ? 'Update Patient' : 'Create Patient' }}
+  </button>
+
+  <button type="button" (click)="resetForm()">
+    Clear
+  </button>
+
+</form>
+
+<p *ngIf="errorMessage">{{ errorMessage }}</p>
+<p *ngIf="successMessage">{{ successMessage }}</p>
+
+<hr>
+
+<h2>Patient List</h2>
+
+<label for="searchCpf">Search by CPF:</label>
+<input #searchCpf id="searchCpf" type="text">
+
+<button
+  type="button"
+  (click)="findByCpf(searchCpf.value)">
+  Search
+</button>
+
+<button type="button" (click)="findAll()">
+  Show All
+</button>
+
+<p *ngIf="loading">Loading...</p>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>CPF</th>
+      <th>Birth Date</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let patient of patients">
+      <td>{{ patient.name }}</td>
+      <td>{{ patient.cpf }}</td>
+      <td>{{ patient.birthDate | date:'dd/MM/yyyy':'UTC' }}</td>
+      <td>{{ patient.email }}</td>
+      <td>{{ patient.phone }}</td>
+      <td>
+        <button
+          type="button"
+          (click)="findById(patient._id)">
+          Edit
+        </button>
+
+        <button
+          type="button"
+          (click)="delete(patient._id)"
+          [disabled]="loading">
+          Delete
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="!loading && patients.length === 0">
+  No patients found.
+</p>
