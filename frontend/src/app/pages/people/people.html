@@ -4,15 +4,11 @@
   <header class="page-header" data-testid="people-header">
     <a class="back-link" routerLink="/app" data-testid="people-back-link">&larr; All Modules</a>
     <h1 data-testid="people-title">People General Registration</h1>
-    <p data-testid="people-description">
-      Register people associated with the hospital and manage their roles.
-    </p>
   </header>
 
   <section class="toolbar" data-testid="people-toolbar">
     <div class="filters">
       <div class="field role-field">
-        <label for="people-role-select" data-testid="people-role-label">Person Role</label>
         <select id="people-role-select" [formControl]="roleControl" data-testid="people-role-select">
           <option value="" disabled data-testid="people-role-option-placeholder">Select a role</option>
           <option
