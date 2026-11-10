@@ -9,7 +9,7 @@ export interface AppModule {
 export const APP_MODULES: AppModule[] = [
   {
     id: 'general-registration',
-    name: 'General Registration',
+    name: 'People General Registration',
     description: 'Manage people, patients and healthcare professionals.',
     route: '/people'
   }

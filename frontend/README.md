@@ -189,7 +189,7 @@ Checks whether the API is responding.
 
 The health check verifies API availability but does not independently validate database health.
 
-### General Registration (People)
+### People General Registration (People)
 
 People associated with the hospital (doctors, nurses, nursing technicians, patients, and custom roles) are registered in the `people` collection through `/api/people`. See [`backend/README.MD`](backend/README.MD) for endpoints, validation rules, and error responses.
 
@@ -199,7 +199,7 @@ People associated with the hospital (doctors, nurses, nursing technicians, patie
 |---|---|
 | `/` | Landing page |
 | `/app` | Module dashboard, generated from the module registry in `frontend/src/app/config/modules.ts` |
-| `/people` | General Registration: list people by role and create, edit, or delete records |
+| `/people` | People General Registration: list people by role and create, edit, or delete records |
 
 ## 🔒 Security
 
