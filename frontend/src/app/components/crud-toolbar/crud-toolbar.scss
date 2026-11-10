@@ -1,0 +1,56 @@
+$surface-light: #1c1c24;
+$royal-blue: #4169e1;
+$royal-blue-hover: #5b82ff;
+$text-primary: #f5f7fa;
+$border: #27272f;
+$danger: #f87171;
+
+.crud-toolbar {
+  display: flex;
+  gap: 10px;
+}
+
+.button {
+  min-width: 84px;
+  padding: 11px 20px;
+  border: 1px solid $royal-blue;
+  border-radius: 10px;
+  background: $royal-blue;
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: $royal-blue-hover;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $royal-blue-hover;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &.secondary {
+    border-color: $border;
+    background: $surface-light;
+    color: $text-primary;
+  }
+
+  &.danger {
+    border-color: $danger;
+    background: transparent;
+    color: $danger;
+  }
+
+  &.secondary:hover:not(:disabled),
+  &.danger:hover:not(:disabled) {
+    background: #24242e;
+  }
+}

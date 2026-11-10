@@ -1,0 +1,30 @@
+<div class="crud-toolbar" role="toolbar" aria-label="Record actions" [attr.data-testid]="testIdPrefix + '-crud-toolbar'">
+  <button
+    type="button"
+    class="button primary"
+    [disabled]="disabled"
+    [attr.data-testid]="testIdPrefix + '-add-button'"
+    (click)="add.emit()">
+    Add
+  </button>
+
+  <button
+    type="button"
+    class="button secondary"
+    [disabled]="disabled || !hasSelection"
+    [attr.title]="hasSelection ? null : 'Select a row to edit'"
+    [attr.data-testid]="testIdPrefix + '-edit-button'"
+    (click)="edit.emit()">
+    Edit
+  </button>
+
+  <button
+    type="button"
+    class="button danger"
+    [disabled]="disabled || !hasSelection"
+    [attr.title]="hasSelection ? null : 'Select a row to delete'"
+    [attr.data-testid]="testIdPrefix + '-delete-button'"
+    (click)="delete.emit()">
+    Delete
+  </button>
+</div>

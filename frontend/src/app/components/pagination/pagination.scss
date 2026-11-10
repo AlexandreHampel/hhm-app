@@ -1,0 +1,70 @@
+$surface: #151519;
+$surface-light: #1c1c24;
+$royal-blue: #4169e1;
+$text-primary: #f5f7fa;
+$text-secondary: #9ca3af;
+$border: #27272f;
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px 24px;
+  padding-top: 16px;
+  color: $text-secondary;
+  font-size: 13px;
+}
+
+.page-size,
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info {
+  margin: 0;
+}
+
+.current {
+  min-width: 96px;
+  text-align: center;
+  color: $text-primary;
+}
+
+select,
+button {
+  border: 1px solid $border;
+  border-radius: 8px;
+  background: $surface;
+  color: $text-primary;
+  font: inherit;
+}
+
+select {
+  padding: 6px 8px;
+}
+
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid $royal-blue;
+  outline-offset: 2px;
+}
+
+button {
+  width: 34px;
+  height: 34px;
+  background: $surface-light;
+  font-size: 16px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: $royal-blue;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}

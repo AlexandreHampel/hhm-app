@@ -1,0 +1,54 @@
+<div class="grid" [attr.data-testid]="testIdPrefix + '-grid'">
+  <div class="grid-body">
+    <table role="grid" [attr.aria-label]="ariaLabel" [attr.data-testid]="testIdPrefix + '-table'">
+      <thead [attr.data-testid]="testIdPrefix + '-table-head'">
+        <tr>
+          <th
+            *ngFor="let column of columns; trackBy: trackByColumn"
+            scope="col"
+            [attr.data-testid]="testIdPrefix + '-table-header-' + column.id">
+            {{ column.header }}
+          </th>
+        </tr>
+      </thead>
+
+      <tbody *ngIf="!loading" [attr.data-testid]="testIdPrefix + '-table-body'">
+        <tr
+          *ngFor="let row of pagedRows; trackBy: trackByRow"
+          tabindex="0"
+          [class.selected]="isSelected(row)"
+          [attr.aria-selected]="isSelected(row)"
+          [attr.data-testid]="testIdPrefix + '-row-' + rowId(row)"
+          (click)="toggleRow(row)"
+          (keydown.enter)="toggleRow(row)"
+          (keydown.space)="$event.preventDefault(); toggleRow(row)">
+          <td
+            *ngFor="let column of columns; trackBy: trackByColumn"
+            [class.nowrap]="column.nowrap"
+            [attr.data-testid]="testIdPrefix + '-' + column.id + '-cell-' + rowId(row)">
+            <ng-container *ngIf="templateFor(column.id) as template; else textCell">
+              <ng-container *ngTemplateOutlet="template; context: { $implicit: row }"></ng-container>
+            </ng-container>
+            <ng-template #textCell>{{ cellValue(column, row) }}</ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <app-loader *ngIf="loading" [testId]="testIdPrefix + '-loading'" [message]="loadingMessage"></app-loader>
+
+    <p *ngIf="!loading && rows.length === 0" class="grid-state" [attr.data-testid]="testIdPrefix + '-empty-state'">
+      {{ emptyMessage }}
+    </p>
+  </div>
+
+  <app-pagination
+    [testIdPrefix]="testIdPrefix"
+    [totalItems]="loading ? 0 : rows.length"
+    [page]="page"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    (pageChange)="changePage($event)"
+    (pageSizeChange)="changePageSize($event)">
+  </app-pagination>
+</div>

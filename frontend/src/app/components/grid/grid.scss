@@ -1,0 +1,80 @@
+$surface: #151519;
+$surface-light: #1c1c24;
+$royal-blue: #4169e1;
+$royal-blue-hover: #5b82ff;
+$text-secondary: #9ca3af;
+$border: #27272f;
+
+:host {
+  display: flex;
+  min-height: 0;
+}
+
+.grid {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  padding: 8px 24px 16px;
+  border: 1px solid $border;
+  border-radius: 18px;
+  background: linear-gradient(145deg, $surface-light, #111115);
+}
+
+.grid-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  padding: 12px;
+  border-bottom: 1px solid $border;
+  text-align: left;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: $surface-light;
+  color: $text-secondary;
+  font-size: 12px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+tbody tr {
+  cursor: pointer;
+
+  &:hover {
+    background: rgba($royal-blue, 0.06);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $royal-blue-hover;
+    outline-offset: -2px;
+  }
+
+  &.selected {
+    background: rgba($royal-blue, 0.16);
+    box-shadow: inset 3px 0 0 $royal-blue;
+  }
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.grid-state {
+  margin: 48px 0;
+  color: $text-secondary;
+  text-align: center;
+}

@@ -1,59 +1,216 @@
-# Hhm
+# 🏥 HHM — Hampel Hospital Management
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.6.
+**Hospital Management System | Full Stack Application**
 
-## Development server
+A modern, modular hospital management system built with Angular, Node.js, TypeScript, and MongoDB.
 
-To start a local development server, run:
+HHM (Hampel Hospital Management) aims to centralize hospital operations through a scalable, maintainable, and user-friendly web application.
 
-```bash
-ng serve
+![Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+
+**Project Status:** 🚧 Under Development
+
+---
+
+## 📋 Overview
+
+HHM is a full-stack hospital ERP project designed to streamline administrative and clinical workflows.
+
+The application follows a layered architecture, separating the frontend, backend, and database to support modular development and long-term maintainability.
+
+### Key Objectives
+
+- Centralize hospital information and operations.
+- Implement CRUD operations for hospital entities.
+- Provide a RESTful API for frontend and backend communication.
+- Maintain a modular and extensible codebase.
+- Support future integrations and new features.
+
+## 🛠️ Tech Stack
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| Frontend | Angular | Web user interface |
+| Language | TypeScript | Type-safe development |
+| Backend | Node.js | Server-side runtime |
+| API | Express | HTTP routing and middleware |
+| Database | MongoDB | Data persistence |
+| ODM | Mongoose | MongoDB object modeling |
+| Development | tsx | TypeScript development runtime |
+
+## 🏗️ Architecture
+
+```text
+                     ┌────────────────────┐
+                     │   Angular Client   │
+                     │     Frontend       │
+                     └─────────┬──────────┘
+                               │
+                           HTTP / JSON
+                               │
+                     ┌─────────▼──────────┐
+                     │    Express API     │
+                     │      Backend       │
+                     └─────────┬──────────┘
+                               │
+                            Mongoose
+                               │
+                     ┌─────────▼──────────┐
+                     │      MongoDB       │
+                     │    Database HHM    │
+                     └────────────────────┘
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Project Structure
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```text
+hhm/
+├── frontend/
+│   └── ...                  # Angular application
+│
+├── backend/
+│   ├── src/
+│   │   └── config/
+│   │       ├── app.ts       # Express configuration
+│   │       ├── server.ts    # Application entry point
+│   │       └── database.ts  # MongoDB connection
+│   │
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── .gitignore
+├── LICENSE
+└── README.md
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 🚀 Getting Started
+
+### Prerequisites
+
+Make sure the following tools are installed:
+
+- Node.js and npm
+- Angular CLI
+- MongoDB Community Server
+- Git
+
+### 1. Clone the Repository
 
 ```bash
-ng generate --help
+git clone <repository-url>
+cd hhm
 ```
 
-## Building
-
-To build the project run:
+### 2. Backend Setup
 
 ```bash
-ng build
+cd backend
+npm install
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Configure the local environment before starting the application.
 
-## Running unit tests
+### 3. Database Configuration
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+HHM uses MongoDB as its primary database, with Mongoose handling database connections and data modeling.
+
+The database connection is managed through `backend/src/config/database.ts`.
+
+Before running the backend, ensure that:
+
+- MongoDB is installed and running.
+- A database user with the required permissions is available.
+- The local database connection is properly configured.
+- Sensitive configuration files are excluded from version control.
+
+The application establishes the database connection during server startup.
+
+### 4. Run the Backend
+
+**Development mode**
 
 ```bash
-ng test
+npm run dev
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+**Production build**
 
 ```bash
-ng e2e
+npm run build
+npm start
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+By default, the API runs at:
 
-## Additional Resources
+`http://localhost:3000`
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### 5. Frontend Setup
+
+Open another terminal from the repository root:
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Alternatively, use:
+
+```bash
+npx ng serve
+```
+
+By default, the frontend runs at:
+
+`http://localhost:4200`
+
+## 🔌 API Reference
+
+### Health Check
+
+Checks whether the API is responding.
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/health` | Returns the API status |
+
+**Example Response**
+
+```json
+{
+  "status": "ok",
+  "application": "HHM API"
+}
+```
+
+The health check verifies API availability but does not independently validate database health.
+
+### General Registration (People)
+
+People associated with the hospital (doctors, nurses, nursing technicians, patients, and custom roles) are registered in the `people` collection through `/api/people`. See [`backend/README.MD`](backend/README.MD) for endpoints, validation rules, and error responses.
+
+## 🧭 Application Routes
+
+| Route | Page |
+|---|---|
+| `/` | Landing page |
+| `/app` | Module dashboard, generated from the module registry in `frontend/src/app/config/modules.ts` |
+| `/people` | General Registration: list people by role and create, edit, or delete records |
+
+## 🔒 Security
+
+HHM is designed with security and maintainability in mind.
+
+Sensitive configuration is managed outside the source code and must not be committed to version control.
+
+Before processing real patient information, the application will require additional safeguards, including access control, data protection, secure authentication, and compliance with applicable privacy regulations such as Brazil's LGPD.
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+Copyright © 2026 Alexandre Hampel.

@@ -1,0 +1,44 @@
+<button
+  type="button"
+  class="filter-button"
+  [class.active]="activeCount > 0"
+  [attr.aria-label]="activeCount > 0 ? title + ' (' + activeCount + ' active)' : title"
+  [title]="title"
+  [attr.data-testid]="testIdPrefix + '-button'"
+  (click)="open()">
+  <mat-icon aria-hidden="true">filter_alt</mat-icon>
+  <span *ngIf="activeCount > 0" class="filter-count" [attr.data-testid]="testIdPrefix + '-active-count'">
+    {{ activeCount }}
+  </span>
+</button>
+
+<app-form-dialog
+  *ngIf="isOpen"
+  [testIdPrefix]="testIdPrefix"
+  [formId]="testIdPrefix + '-form'"
+  [title]="title"
+  submitLabel="Apply"
+  submitAction="apply"
+  secondaryLabel="Clear"
+  secondaryAction="clear"
+  (cancel)="close()"
+  (secondary)="clear()">
+
+  <form [id]="testIdPrefix + '-form'" [formGroup]="form" (ngSubmit)="apply()" novalidate [attr.data-testid]="testIdPrefix + '-form'">
+    <div class="form-grid">
+      <div *ngFor="let field of fields; trackBy: trackByField" class="field" [class.full]="field.fullWidth">
+        <label [for]="testIdPrefix + '-' + field.id" [attr.data-testid]="testIdPrefix + '-' + field.id + '-label'">
+          {{ field.label }}
+        </label>
+        <input
+          [id]="testIdPrefix + '-' + field.id"
+          [type]="field.type ?? 'text'"
+          [attr.inputmode]="field.inputMode ?? null"
+          [attr.placeholder]="field.placeholder ?? null"
+          [formControlName]="field.id"
+          autocomplete="off"
+          [attr.data-testid]="testIdPrefix + '-' + field.id + '-input'">
+      </div>
+    </div>
+  </form>
+</app-form-dialog>

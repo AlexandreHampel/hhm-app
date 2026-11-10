@@ -1,0 +1,116 @@
+$text-secondary: #9ca3af;
+$glow: #7df9ff;
+
+.loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 168px;
+  padding: 48px 0;
+
+  &.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.65);
+  }
+}
+
+.icon {
+  overflow: visible;
+}
+
+.ring-glow,
+.ring,
+.ring-core {
+  fill: none;
+}
+
+.ring-glow {
+  stroke: #1e7bff;
+  stroke-width: 6;
+  opacity: 0.25;
+}
+
+.ring {
+  stroke: #0a5dff;
+  stroke-width: 2.6;
+}
+
+.ring-core {
+  stroke: #5fb3ff;
+  stroke-width: 0.8;
+}
+
+.letter-outline {
+  fill: none;
+  stroke: #083d9e;
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+
+.trail,
+.runner {
+  fill: none;
+  stroke-linecap: round;
+  animation: walk 1s linear infinite;
+}
+
+.runner {
+  stroke: #ffffff;
+  stroke-width: 3;
+  stroke-dasharray: 12 88;
+  filter: drop-shadow(0 0 2px $glow) drop-shadow(0 0 5px $glow);
+}
+
+.trail {
+  stroke: $glow;
+  stroke-width: 4;
+  stroke-opacity: 0.45;
+  stroke-dasharray: 26 74;
+  stroke-dashoffset: 14;
+  animation-name: walk-trail;
+}
+
+.message {
+  margin: 0;
+  color: $text-secondary;
+  font-size: 14px;
+}
+
+@keyframes walk {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+@keyframes walk-trail {
+  to {
+    stroke-dashoffset: -86;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trail {
+    display: none;
+  }
+
+  .runner {
+    stroke-dasharray: none;
+    animation: pulse 1s ease-in-out infinite;
+  }
+}

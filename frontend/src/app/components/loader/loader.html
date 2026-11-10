@@ -1,0 +1,55 @@
+<div
+  class="loader"
+  [class.overlay]="overlay"
+  role="status"
+  aria-live="polite"
+  aria-busy="true"
+  [attr.data-testid]="testId">
+  <svg
+    class="icon"
+    viewBox="0 0 100 100"
+    aria-hidden="true"
+    [attr.width]="size"
+    [attr.height]="size"
+    [attr.data-testid]="testId + '-icon'">
+    <defs>
+      <clipPath [attr.id]="testId + '-letter-clip'">
+        <polygon [attr.points]="letterPoints"></polygon>
+      </clipPath>
+      <linearGradient [attr.id]="testId + '-letter-base'" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#0060ff"></stop>
+        <stop offset="1" stop-color="#0a80fa"></stop>
+      </linearGradient>
+      <linearGradient [attr.id]="testId + '-letter-highlight'" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#0f98ff"></stop>
+        <stop offset="1" stop-color="#45e8ff"></stop>
+      </linearGradient>
+    </defs>
+
+    <rect class="ring-glow" x="7.9" y="8.9" width="83" height="81.6" rx="17.5"></rect>
+    <rect class="ring" x="7.9" y="8.9" width="83" height="81.6" rx="17.5"></rect>
+    <rect class="ring-core" x="7.9" y="8.9" width="83" height="81.6" rx="17.5"></rect>
+
+    <polygon class="letter" [attr.points]="letterPoints" [attr.fill]="'url(#' + testId + '-letter-base)'"></polygon>
+    <polygon
+      class="letter"
+      points="20,75.2 75.5,24.1 75.5,0 0,0 0,75.2"
+      [attr.clip-path]="'url(#' + testId + '-letter-clip)'"
+      [attr.fill]="'url(#' + testId + '-letter-highlight)'">
+    </polygon>
+    <polygon class="letter-outline" [attr.points]="letterPoints"></polygon>
+
+    <rect class="trail" x="7.9" y="8.9" width="83" height="81.6" rx="17.5" pathLength="100"></rect>
+    <rect
+      class="runner"
+      x="7.9"
+      y="8.9"
+      width="83"
+      height="81.6"
+      rx="17.5"
+      pathLength="100"
+      [attr.data-testid]="testId + '-border'">
+    </rect>
+  </svg>
+  <p class="message" [attr.data-testid]="testId + '-message'">{{ message }}</p>
+</div>

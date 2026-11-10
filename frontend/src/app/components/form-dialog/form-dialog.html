@@ -1,0 +1,54 @@
+<div class="overlay" [attr.data-testid]="testIdPrefix + '-form-overlay'" (keydown.escape)="onEscape($event)">
+  <section
+    class="dialog"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="testIdPrefix + '-form-title'"
+    [attr.data-testid]="testIdPrefix + '-form-dialog'">
+
+    <header>
+      <h2 [id]="testIdPrefix + '-form-title'" [attr.data-testid]="testIdPrefix + '-form-title'">{{ title }}</h2>
+      <button
+        type="button"
+        class="close"
+        aria-label="Close"
+        [disabled]="busy"
+        [attr.data-testid]="testIdPrefix + '-form-close-button'"
+        (click)="cancel.emit()">
+        &times;
+      </button>
+    </header>
+
+    <div class="body">
+      <ng-content></ng-content>
+    </div>
+
+    <footer>
+      <button
+        *ngIf="secondaryLabel"
+        type="button"
+        class="button tertiary"
+        [disabled]="busy"
+        [attr.data-testid]="testIdPrefix + '-' + secondaryAction + '-button'"
+        (click)="secondary.emit()">
+        {{ secondaryLabel }}
+      </button>
+      <button
+        type="button"
+        class="button secondary"
+        [disabled]="busy"
+        [attr.data-testid]="testIdPrefix + '-cancel-button'"
+        (click)="cancel.emit()">
+        {{ cancelLabel }}
+      </button>
+      <button
+        type="submit"
+        class="button primary"
+        [attr.form]="formId"
+        [disabled]="busy"
+        [attr.data-testid]="testIdPrefix + '-' + submitAction + '-button'">
+        {{ busy ? busyLabel : submitLabel }}
+      </button>
+    </footer>
+  </section>
+</div>

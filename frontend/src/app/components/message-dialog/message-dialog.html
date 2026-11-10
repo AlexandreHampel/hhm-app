@@ -1,0 +1,41 @@
+<div class="overlay" [attr.data-testid]="testIdPrefix + '-overlay'" (keydown.escape)="onEscape($event)">
+  <section
+    class="dialog"
+    [ngClass]="type"
+    [attr.role]="type === 'success' ? 'dialog' : 'alertdialog'"
+    aria-modal="true"
+    [attr.aria-labelledby]="testIdPrefix + '-title'"
+    [attr.aria-describedby]="testIdPrefix + '-message'"
+    [attr.data-type]="type"
+    [attr.data-testid]="testIdPrefix + '-dialog'">
+
+    <header>
+      <mat-icon class="icon" aria-hidden="true" [attr.data-testid]="testIdPrefix + '-icon'">{{ icon }}</mat-icon>
+      <h2 [id]="testIdPrefix + '-title'" [attr.data-testid]="testIdPrefix + '-title'">{{ title }}</h2>
+    </header>
+
+    <p [id]="testIdPrefix + '-message'" class="message" [attr.data-testid]="testIdPrefix + '-message'">{{ message }}</p>
+
+    <footer>
+      <button
+        *ngIf="cancelLabel"
+        #cancelButton
+        type="button"
+        class="button secondary"
+        [disabled]="busy"
+        [attr.data-testid]="testIdPrefix + '-cancel-button'"
+        (click)="cancel.emit()">
+        {{ cancelLabel }}
+      </button>
+      <button
+        #confirmButton
+        type="button"
+        class="button primary"
+        [disabled]="busy"
+        [attr.data-testid]="testIdPrefix + '-' + confirmAction + '-button'"
+        (click)="confirm.emit()">
+        {{ busy ? busyLabel : confirmLabel }}
+      </button>
+    </footer>
+  </section>
+</div>

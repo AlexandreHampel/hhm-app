@@ -1,29 +1,31 @@
 
-<h1 data-testid="modules-title">HHM Modules</h1>
+<main data-testid="app-page">
+  <h1 data-testid="app-title">HHM Modules</h1>
 
-<p data-testid="modules-description">
-  Select a module to continue.
-</p>
+  <p data-testid="app-description">
+    Select a module to continue.
+  </p>
 
-<div class="modules-grid" data-testid="modules-grid">
-  <div
-    *ngFor="let module of modules"
-    class="module-card"
-    [attr.data-testid]="'modules-card-' + module.id">
+  <div class="modules-grid" data-testid="app-modules-list">
+    <div
+      *ngFor="let module of modules"
+      class="module-card"
+      [attr.data-testid]="'app-module-' + module.id">
 
-    <h2 [attr.data-testid]="'modules-name-' + module.id">
-      {{ module.name }}
-    </h2>
+      <h2 [attr.data-testid]="'app-module-name-' + module.id">
+        {{ module.name }}
+      </h2>
 
-    <p [attr.data-testid]="'modules-description-' + module.id">
-      {{ module.description }}
-    </p>
+      <p [attr.data-testid]="'app-module-description-' + module.id">
+        {{ module.description }}
+      </p>
 
-    <a
-      [routerLink]="module.route"
-      [attr.data-testid]="'modules-open-' + module.id">
-      Open Module
-    </a>
+      <a
+        [routerLink]="module.route"
+        [attr.data-testid]="'app-module-open-' + module.id">
+        Open Module
+      </a>
 
+    </div>
   </div>
-</div>
+</main>

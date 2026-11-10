@@ -1,0 +1,235 @@
+
+<main class="people-page" data-testid="people-page">
+
+  <header class="page-header" data-testid="people-header">
+    <a class="back-link" routerLink="/app" data-testid="people-back-link">&larr; All Modules</a>
+    <h1 data-testid="people-title">General Registration</h1>
+    <p data-testid="people-description">
+      Register people associated with the hospital and manage their roles.
+    </p>
+  </header>
+
+  <section class="toolbar" data-testid="people-toolbar">
+    <div class="filters">
+      <div class="field role-field">
+        <label for="people-role-select" data-testid="people-role-label">Person Role</label>
+        <select id="people-role-select" [formControl]="roleControl" data-testid="people-role-select">
+          <option value="" disabled data-testid="people-role-option-placeholder">Select a role</option>
+          <option
+            *ngFor="let role of roleOptions; trackBy: trackByRoleOption"
+            [value]="role.value"
+            [attr.data-testid]="'people-role-option-' + role.key">
+            {{ role.label }}
+          </option>
+        </select>
+      </div>
+
+      <app-filter
+        testIdPrefix="people-filter"
+        title="Filter People"
+        [fields]="filterFields"
+        (filterChange)="changeFilter($event)">
+      </app-filter>
+    </div>
+
+    <app-crud-toolbar
+      testIdPrefix="people"
+      [hasSelection]="!!selectedPerson"
+      [disabled]="loading || loadingPerson"
+      (add)="openCreateForm()"
+      (edit)="editSelected()"
+      (delete)="deleteSelected()">
+    </app-crud-toolbar>
+  </section>
+
+  <section class="list-section" data-testid="people-list-section">
+    <app-grid
+      testIdPrefix="people"
+      ariaLabel="People"
+      loadingMessage="Loading people..."
+      [columns]="columns"
+      [rows]="filteredPeople"
+      [rowId]="personId"
+      [loading]="loading"
+      [emptyMessage]="emptyMessage"
+      [(selectedRow)]="selectedPerson">
+
+      <ng-template appGridCell="cpf" let-person>{{ person.cpf | cpf }}</ng-template>
+
+      <ng-template appGridCell="birth-date" let-person>{{ person.birthDate | date: 'dd/MM/yyyy' : 'UTC' }}</ng-template>
+
+      <ng-template appGridCell="phone" let-person>{{ person.phone ? (person.phone | phone) : '—' }}</ng-template>
+
+      <ng-template appGridCell="roles" let-person>
+        <span
+          *ngFor="let role of person.roles; trackBy: trackByValue"
+          class="badge"
+          [attr.data-testid]="'people-role-badge-' + person._id + '-' + roleKey(role)">
+          {{ roleLabel(role) }}
+        </span>
+      </ng-template>
+
+      <ng-template appGridCell="custom-roles" let-person>
+        <span *ngFor="let customRole of person.custom_roles; trackBy: trackByValue" class="badge custom">
+          {{ customRole }}
+        </span>
+        <ng-container *ngIf="!person.custom_roles.length">—</ng-container>
+      </ng-template>
+    </app-grid>
+  </section>
+
+  <app-form-dialog
+    *ngIf="formOpen"
+    testIdPrefix="people"
+    formId="people-form"
+    [title]="editingId ? 'Edit Person' : 'Add Person'"
+    [busy]="saving"
+    (cancel)="closeForm()">
+
+    <form id="people-form" [formGroup]="personForm" (ngSubmit)="save()" novalidate data-testid="people-form">
+      <div class="form-grid">
+        <div class="field full">
+          <label for="people-name" data-testid="people-name-label">Name *</label>
+          <input id="people-name" type="text" formControlName="name" autocomplete="off" data-testid="people-name-input">
+          <small *ngIf="hasError(personForm.controls.name)" class="field-error" data-testid="people-name-validation-error">
+            Name is required.
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="people-cpf" data-testid="people-cpf-label">CPF *</label>
+          <input id="people-cpf" type="text" formControlName="cpf" inputmode="numeric" placeholder="000.000.000-00" autocomplete="off" data-testid="people-cpf-input">
+          <small *ngIf="hasError(personForm.controls.cpf)" class="field-error" data-testid="people-cpf-validation-error">
+            <ng-container *ngIf="personForm.controls.cpf.hasError('required')">CPF is required.</ng-container>
+            <ng-container *ngIf="personForm.controls.cpf.hasError('cpfFormat')">CPF must contain exactly 11 digits.</ng-container>
+            <ng-container *ngIf="personForm.controls.cpf.hasError('cpfInvalid')">CPF is invalid.</ng-container>
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="people-birth-date" data-testid="people-birth-date-label">Birth Date *</label>
+          <input id="people-birth-date" type="date" formControlName="birthDate" [max]="maxBirthDate" data-testid="people-birth-date-input">
+          <small *ngIf="hasError(personForm.controls.birthDate)" class="field-error" data-testid="people-birth-date-validation-error">
+            {{ personForm.controls.birthDate.hasError('futureDate') ? 'Birth date cannot be in the future.' : 'Birth date is required.' }}
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="people-email" data-testid="people-email-label">Email</label>
+          <input id="people-email" type="email" formControlName="email" autocomplete="off" data-testid="people-email-input">
+          <small *ngIf="hasError(personForm.controls.email)" class="field-error" data-testid="people-email-validation-error">
+            Enter a valid email address.
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="people-phone" data-testid="people-phone-label">Phone</label>
+          <input id="people-phone" type="tel" formControlName="phone" placeholder="(00) 00000-0000" autocomplete="off" data-testid="people-phone-input">
+          <small *ngIf="hasError(personForm.controls.phone)" class="field-error" data-testid="people-phone-validation-error">
+            Enter a valid phone number (8 to 15 digits).
+          </small>
+        </div>
+      </div>
+
+      <fieldset formGroupName="roles" data-testid="people-roles-group">
+        <legend data-testid="people-roles-label">Roles *</legend>
+        <div class="checkbox-list">
+          <label
+            *ngFor="let role of roleOptions; trackBy: trackByRoleOption"
+            class="checkbox"
+            [attr.data-testid]="'people-roles-option-' + role.key">
+            <input type="checkbox" [formControlName]="role.value" [attr.data-testid]="'people-roles-checkbox-' + role.key">
+            {{ role.label }}
+          </label>
+        </div>
+        <small *ngIf="hasError(personForm.controls.roles)" class="field-error" data-testid="people-roles-validation-error">
+          Select at least one role.
+        </small>
+      </fieldset>
+
+      <fieldset *ngIf="isOtherSelected" formArrayName="custom_roles" data-testid="people-custom-roles-group">
+        <legend data-testid="people-custom-roles-label">Custom Roles *</legend>
+
+        <div
+          *ngFor="let customRole of customRoles.controls; trackBy: trackByClientId"
+          class="custom-role"
+          [formGroup]="customRole"
+          [attr.data-testid]="'people-custom-roles-item-' + customRole.controls.clientId.value">
+          <div class="custom-role-row">
+            <input
+              type="text"
+              formControlName="name"
+              autocomplete="off"
+              placeholder="e.g. Physiotherapist"
+              [attr.aria-label]="'Custom role ' + customRole.controls.clientId.value"
+              [attr.data-testid]="'people-custom-roles-input-' + customRole.controls.clientId.value">
+            <button
+              type="button"
+              class="button"
+              [attr.data-testid]="'people-custom-roles-remove-' + customRole.controls.clientId.value"
+              (click)="removeCustomRole(customRole.controls.clientId.value)">
+              Remove
+            </button>
+          </div>
+          <small
+            *ngIf="hasError(customRole.controls.name)"
+            class="field-error"
+            [attr.data-testid]="'people-custom-roles-input-validation-error-' + customRole.controls.clientId.value">
+            Custom role cannot be blank.
+          </small>
+        </div>
+
+        <small *ngIf="personForm.hasError('customRolesRequired')" class="field-error" data-testid="people-custom-roles-required-validation-error">
+          Add at least one custom role for the Other role.
+        </small>
+        <small *ngIf="customRoles.hasError('duplicateCustomRoles')" class="field-error" data-testid="people-custom-roles-duplicate-validation-error">
+          Custom roles must be unique.
+        </small>
+
+        <button type="button" class="button" (click)="addCustomRole()" data-testid="people-custom-roles-add-button">
+          Add Custom Role
+        </button>
+      </fieldset>
+
+      <p *ngIf="submitted && personForm.invalid" class="field-error summary" data-testid="people-form-validation-error">
+        Please correct the highlighted fields before saving.
+      </p>
+    </form>
+  </app-form-dialog>
+
+  <app-loader *ngIf="loadingPerson" testId="people-person-loading" message="Loading person..." [overlay]="true"></app-loader>
+
+  <app-message-dialog
+    *ngIf="personToDelete as person"
+    testIdPrefix="people-delete"
+    type="warning"
+    title="Delete Person"
+    [message]="'Are you sure you want to delete ' + person.name + '? This action cannot be undone.'"
+    confirmLabel="Delete"
+    confirmAction="confirm"
+    cancelLabel="Cancel"
+    busyLabel="Deleting..."
+    [busy]="deleting"
+    (confirm)="delete(person._id)"
+    (cancel)="cancelDelete()">
+  </app-message-dialog>
+
+  <app-message-dialog
+    *ngIf="successMessage"
+    testIdPrefix="people-success"
+    type="success"
+    title="Success"
+    [message]="successMessage"
+    (confirm)="closeSuccess()">
+  </app-message-dialog>
+
+  <app-message-dialog
+    *ngIf="errorMessage"
+    testIdPrefix="people-error"
+    type="error"
+    title="Error"
+    [message]="errorMessage"
+    (confirm)="closeError()">
+  </app-message-dialog>
+
+</main>

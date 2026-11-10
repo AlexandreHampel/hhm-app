@@ -1,0 +1,62 @@
+<nav class="pagination" aria-label="Pagination" [attr.data-testid]="testIdPrefix + '-pagination'">
+  <div class="page-size">
+    <label [for]="testIdPrefix + '-pagination-page-size'" [attr.data-testid]="testIdPrefix + '-pagination-page-size-label'">
+      Rows per page
+    </label>
+    <select
+      #pageSizeSelect
+      [id]="testIdPrefix + '-pagination-page-size'"
+      [attr.data-testid]="testIdPrefix + '-pagination-page-size-select'"
+      (change)="changePageSize(pageSizeSelect.value)">
+      <option
+        *ngFor="let option of pageSizeOptions; trackBy: trackByValue"
+        [value]="option"
+        [selected]="option === pageSize"
+        [attr.data-testid]="testIdPrefix + '-pagination-page-size-option-' + option">
+        {{ option }}
+      </option>
+    </select>
+  </div>
+
+  <p class="info" [attr.data-testid]="testIdPrefix + '-pagination-info'">
+    {{ firstItem }}–{{ lastItem }} of {{ totalItems }}
+  </p>
+
+  <div class="controls">
+    <button
+      type="button"
+      aria-label="First page"
+      [disabled]="page <= 1"
+      [attr.data-testid]="testIdPrefix + '-pagination-first-button'"
+      (click)="goTo(1)">
+      &laquo;
+    </button>
+    <button
+      type="button"
+      aria-label="Previous page"
+      [disabled]="page <= 1"
+      [attr.data-testid]="testIdPrefix + '-pagination-previous-button'"
+      (click)="goTo(page - 1)">
+      &lsaquo;
+    </button>
+    <span class="current" aria-live="polite" [attr.data-testid]="testIdPrefix + '-pagination-page-indicator'">
+      Page {{ page }} of {{ totalPages }}
+    </span>
+    <button
+      type="button"
+      aria-label="Next page"
+      [disabled]="page >= totalPages"
+      [attr.data-testid]="testIdPrefix + '-pagination-next-button'"
+      (click)="goTo(page + 1)">
+      &rsaquo;
+    </button>
+    <button
+      type="button"
+      aria-label="Last page"
+      [disabled]="page >= totalPages"
+      [attr.data-testid]="testIdPrefix + '-pagination-last-button'"
+      (click)="goTo(totalPages)">
+      &raquo;
+    </button>
+  </div>
+</nav>
