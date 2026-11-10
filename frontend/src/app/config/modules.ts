@@ -2,7 +2,7 @@
 export interface AppModule {
   id: string;
   name: string;
-  description: string;
+  icon: string;
   route: string;
 }
 
@@ -10,7 +10,7 @@ export const APP_MODULES: AppModule[] = [
   {
     id: 'general-registration',
     name: 'People General Registration',
-    description: 'Manage people, patients and healthcare professionals.',
+    icon: 'groups',
     route: '/people'
   }
 ];

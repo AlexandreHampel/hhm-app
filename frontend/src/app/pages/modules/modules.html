@@ -1,31 +1,37 @@
 
 <main data-testid="app-page">
-  <h1 data-testid="app-title">HHM Modules</h1>
 
-  <p data-testid="app-description">
-    Select a module to continue.
-  </p>
+  <div>
+    <h1 data-testid="app-title">HHM Modules</h1>
+  </div>
 
   <div class="modules-grid" data-testid="app-modules-list">
-    <div
+
+    <a
       *ngFor="let module of modules"
       class="module-card"
+      [routerLink]="module.route"
       [attr.data-testid]="'app-module-' + module.id">
 
-      <h2 [attr.data-testid]="'app-module-name-' + module.id">
-        {{ module.name }}
-      </h2>
+      <mat-icon
+        class="module-icon"
+        aria-hidden="true"
+        [attr.data-testid]="'app-module-icon-' + module.id">
+        {{ module.icon }}
+      </mat-icon>
 
-      <p [attr.data-testid]="'app-module-description-' + module.id">
-        {{ module.description }}
-      </p>
+      <div class="module-footer">
+        <h2 [attr.data-testid]="'app-module-name-' + module.id">
+          {{ module.name }}
+        </h2>
 
-      <a
-        [routerLink]="module.route"
-        [attr.data-testid]="'app-module-open-' + module.id">
-        Open Module
-      </a>
+        <mat-icon class="module-arrow" aria-hidden="true">
+          arrow_forward
+        </mat-icon>
+      </div>
 
-    </div>
+    </a>
+
   </div>
+
 </main>
