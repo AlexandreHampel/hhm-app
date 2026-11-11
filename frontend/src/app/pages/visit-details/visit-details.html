@@ -28,10 +28,6 @@
   </section>
 
   <ng-container *ngIf="!loading && visit">
-    <p *ngIf="!isActive" class="closed-notice" role="status" data-testid="visits-details-closed-notice">
-      {{ visit.status === 'COMPLETED' ? 'Completed' : 'Cancelled' }} on {{ visit.closedAt | date: 'dd/MM/yyyy HH:mm' }}. Read-only.
-    </p>
-
     <section class="card" aria-labelledby="visits-details-summary-title" data-testid="visits-details-summary">
       <div class="card-header">
         <h2 id="visits-details-summary-title" data-testid="visits-details-summary-title">Summary</h2>
@@ -362,6 +358,15 @@
     [busy]="savingMovement"
     (confirm)="confirmClosingMovement()"
     (cancel)="cancelClosingMovement()">
+  </app-message-dialog>
+
+  <app-message-dialog
+    *ngIf="readOnlyMessage"
+    testIdPrefix="visits-details-read-only"
+    type="warning"
+    title="Read-only Visit"
+    [message]="readOnlyMessage"
+    (confirm)="closeReadOnlyMessage()">
   </app-message-dialog>
 
   <app-message-dialog

@@ -22,6 +22,27 @@ $success: #34d399;
   color-scheme: dark;
 }
 
+// Every page fills the screen.
+main {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+}
+
+// Page-level loading state: centered on the screen, without blocking the
+// page header (e.g. the back link).
+main > app-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
 * {
   box-sizing: border-box;
 }

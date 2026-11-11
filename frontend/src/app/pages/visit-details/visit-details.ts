@@ -1,6 +1,6 @@
 
-import { ChangeDetectorRef, Component, DestroyRef, HostListener, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, DestroyRef, HostListener, LOCALE_ID, OnInit, inject } from '@angular/core';
+import { CommonModule, formatDate } from '@angular/common';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -48,6 +48,7 @@ export class VisitDetails implements OnInit {
   private readonly loaderService = inject(LoaderService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly locale = inject(LOCALE_ID);
 
   readonly typeOptions = VISIT_TYPES;
   readonly movementTypeOptions = VISIT_MOVEMENT_TYPES;
@@ -71,6 +72,7 @@ export class VisitDetails implements OnInit {
   // visit). Read while the navigation is still in progress.
   successMessage = (this.router.currentNavigation()?.extras.state?.['successMessage'] as string | undefined) ?? '';
   errorMessage = '';
+  readOnlyMessage = '';
   loading = false;
   notFound = false;
   loadFailed = false;
@@ -189,6 +191,12 @@ export class VisitDetails implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ visit, movements }) => {
+          // Opening a closed visit informs that it is read-only. Closing it on
+          // this page is already confirmed by the success message.
+          if (!this.visit && !isActiveVisit(visit)) {
+            this.readOnlyMessage = this.buildReadOnlyMessage(visit);
+          }
+
           this.visit = visit;
           this.movements = movements;
           this.updateProfessionalOptions();
@@ -339,6 +347,10 @@ export class VisitDetails implements OnInit {
     this.errorMessage = '';
   }
 
+  closeReadOnlyMessage(): void {
+    this.readOnlyMessage = '';
+  }
+
   hasError(control: AbstractControl, submitted: boolean): boolean {
     return control.invalid && (control.touched || submitted);
   }
@@ -369,6 +381,8 @@ export class VisitDetails implements OnInit {
       this.closeError();
     } else if (this.successMessage) {
       this.closeSuccess();
+    } else if (this.readOnlyMessage) {
+      this.closeReadOnlyMessage();
     } else if (this.pendingMovement) {
       if (!this.savingMovement) {
         this.cancelClosingMovement();
@@ -488,6 +502,13 @@ export class VisitDetails implements OnInit {
       responsibleProfessionalId: value.responsibleProfessionalId || null,
       description: value.description.trim() || undefined
     };
+  }
+
+  private buildReadOnlyMessage(visit: Visit): string {
+    const closedAt = visit.closedAt ? ` on ${formatDate(visit.closedAt, 'dd/MM/yyyy HH:mm', this.locale)}` : '';
+    const outcome = visit.status === 'COMPLETED' ? 'completed' : 'cancelled';
+
+    return `This visit was ${outcome}${closedAt}. It is read-only.`;
   }
 
   private buildErrorMessage(action: string, error: HttpErrorResponse): string {

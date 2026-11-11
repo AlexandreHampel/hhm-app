@@ -1,10 +1,7 @@
 @use '../visits/visits-common' as *;
 
 .visit-new-page {
-  display: flex;
-  flex-direction: column;
   gap: 24px;
-  width: min(880px, 100%);
 }
 
 .form-grid {

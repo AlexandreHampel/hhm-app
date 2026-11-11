@@ -1,10 +1,7 @@
 @use '../visits/visits-common' as *;
 
 .visit-details-page {
-  display: flex;
-  flex-direction: column;
   gap: 24px;
-  width: min(1100px, 100%);
 }
 
 .title-row {
@@ -29,16 +26,6 @@
     margin: 0;
     font-size: 20px;
   }
-}
-
-.closed-notice {
-  margin: 0;
-  padding: 12px 16px;
-  border: 1px solid $warning;
-  border-radius: 12px;
-  background: rgba($warning, 0.08);
-  color: $warning;
-  font-size: 14px;
 }
 
 .summary-grid {
