@@ -2,22 +2,20 @@
 <main class="people-page" data-testid="people-page">
 
   <header class="page-header" data-testid="people-header">
-    <a class="back-link" routerLink="/app" data-testid="people-back-link">&larr; All Modules</a>
+    <button type="button" class="back-link" routerLink="/app" [skipLocationChange]="true" data-testid="people-back-link">&larr; All Modules</button>
     <h1 data-testid="people-title">People General Registration</h1>
   </header>
 
   <section class="toolbar" data-testid="people-toolbar">
     <div class="filters">
       <div class="field role-field">
-        <select id="people-role-select" [formControl]="roleControl" data-testid="people-role-select">
-          <option value="" disabled data-testid="people-role-option-placeholder">Select a role</option>
-          <option
-            *ngFor="let role of roleOptions; trackBy: trackByRoleOption"
-            [value]="role.value"
-            [attr.data-testid]="'people-role-option-' + role.key">
-            {{ role.label }}
-          </option>
-        </select>
+        <app-dropdown
+          inputId="people-role-select"
+          testIdPrefix="people-role"
+          placeholder="Select a role"
+          [options]="roleOptions"
+          [formControl]="roleControl">
+        </app-dropdown>
       </div>
 
       <app-filter
@@ -104,7 +102,7 @@
 
         <div class="field">
           <label for="people-birth-date" data-testid="people-birth-date-label">Birth Date *</label>
-          <input id="people-birth-date" type="date" formControlName="birthDate" [max]="maxBirthDate" data-testid="people-birth-date-input">
+          <app-date-picker inputId="people-birth-date" testIdPrefix="people-birth-date" formControlName="birthDate" [max]="maxBirthDate"></app-date-picker>
           <small *ngIf="hasError(personForm.controls.birthDate)" class="field-error" data-testid="people-birth-date-validation-error">
             {{ personForm.controls.birthDate.hasError('futureDate') ? 'Birth date cannot be in the future.' : 'Birth date is required.' }}
           </small>

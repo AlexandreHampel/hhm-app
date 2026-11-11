@@ -42,6 +42,9 @@ h1 {
 
 .module-card {
   position: relative;
+  width: 100%;
+  font: inherit;
+  text-align: left;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

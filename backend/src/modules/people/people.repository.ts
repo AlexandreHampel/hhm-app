@@ -1,5 +1,5 @@
 
-import { UpdateQuery } from 'mongoose';
+import { QueryFilter, UpdateQuery } from 'mongoose';
 import { PersonModel, Person, PersonRole } from './people.model.js';
 
 export class PeopleRepository {
@@ -32,5 +32,10 @@ export class PeopleRepository {
 
   async findByRole(role: PersonRole) {
     return PersonModel.find({ roles: role }).sort({ name: 1 });
+  }
+
+  async findIds(filter: QueryFilter<Person>) {
+    const people = await PersonModel.find(filter, { _id: 1 }).lean();
+    return people.map((person) => person._id);
   }
 }

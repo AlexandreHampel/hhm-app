@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Dropdown, DropdownOption } from '../dropdown/dropdown';
 
 @Component({
   selector: 'app-pagination',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Dropdown],
   templateUrl: './pagination.html',
   styleUrl: './pagination.scss'
 })
@@ -18,6 +19,14 @@ export class Pagination {
 
   @Output() pageChange = new EventEmitter<number>();
   @Output() pageSizeChange = new EventEmitter<number>();
+
+  get pageSizeDropdownOptions(): DropdownOption[] {
+    return this.pageSizeOptions.map((option) => ({
+      value: option.toString(),
+      label: option.toString(),
+      key: option.toString()
+    }));
+  }
 
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
@@ -45,9 +54,5 @@ export class Pagination {
     if (pageSize !== this.pageSize) {
       this.pageSizeChange.emit(pageSize);
     }
-  }
-
-  trackByValue(_index: number, value: number): number {
-    return value;
   }
 }

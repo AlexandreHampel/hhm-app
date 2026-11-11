@@ -3,19 +3,14 @@
     <label [for]="testIdPrefix + '-pagination-page-size'" [attr.data-testid]="testIdPrefix + '-pagination-page-size-label'">
       Rows per page
     </label>
-    <select
-      #pageSizeSelect
-      [id]="testIdPrefix + '-pagination-page-size'"
-      [attr.data-testid]="testIdPrefix + '-pagination-page-size-select'"
-      (change)="changePageSize(pageSizeSelect.value)">
-      <option
-        *ngFor="let option of pageSizeOptions; trackBy: trackByValue"
-        [value]="option"
-        [selected]="option === pageSize"
-        [attr.data-testid]="testIdPrefix + '-pagination-page-size-option-' + option">
-        {{ option }}
-      </option>
-    </select>
+    <app-dropdown
+      size="compact"
+      [inputId]="testIdPrefix + '-pagination-page-size'"
+      [testIdPrefix]="testIdPrefix + '-pagination-page-size'"
+      [options]="pageSizeDropdownOptions"
+      [value]="pageSize.toString()"
+      (valueChange)="changePageSize($event)">
+    </app-dropdown>
   </div>
 
   <p class="info" [attr.data-testid]="testIdPrefix + '-pagination-info'">

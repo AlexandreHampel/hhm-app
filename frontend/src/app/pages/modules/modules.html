@@ -7,10 +7,11 @@
 
   <div class="modules-grid" data-testid="app-modules-list">
 
-    <a
+    <button
+      type="button"
       *ngFor="let module of modules"
       class="module-card"
-      [routerLink]="module.route"
+      [routerLink]="module.route" [skipLocationChange]="true"
       [attr.data-testid]="'app-module-' + module.id">
 
       <mat-icon
@@ -30,7 +31,7 @@
         </mat-icon>
       </div>
 
-    </a>
+    </button>
 
   </div>
 

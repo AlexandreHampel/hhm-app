@@ -33,7 +33,6 @@ $border: #27272f;
   color: $text-primary;
 }
 
-select,
 button {
   border: 1px solid $border;
   border-radius: 8px;
@@ -42,11 +41,6 @@ button {
   font: inherit;
 }
 
-select {
-  padding: 6px 8px;
-}
-
-select:focus-visible,
 button:focus-visible {
   outline: 2px solid $royal-blue;
   outline-offset: 2px;

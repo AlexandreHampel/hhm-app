@@ -3,31 +3,36 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { FormDialog } from '../form-dialog/form-dialog';
+import { Dropdown, DropdownOption } from '../dropdown/dropdown';
+import { DatePicker } from '../date-picker/date-picker';
 
 export type FilterMatch = 'contains' | 'digits' | 'equals';
 
 export type FilterValues = Record<string, string>;
 
+// `match` and `value` are used by filterRows (client-side filtering). Pages
+// that filter on the server only use the values emitted by the component.
 export interface FilterField<T> {
   id: string;
   label: string;
-  match: FilterMatch;
-  value: (row: T) => string | string[] | null | undefined;
-  type?: 'text' | 'date' | 'tel' | 'email';
+  match?: FilterMatch;
+  value?: (row: T) => string | string[] | null | undefined;
+  type?: 'text' | 'date' | 'tel' | 'email' | 'select';
+  options?: DropdownOption[];
   inputMode?: 'text' | 'numeric' | 'tel' | 'email';
   placeholder?: string;
   fullWidth?: boolean;
 }
 
 export function filterRows<T>(rows: T[], fields: FilterField<T>[], values: FilterValues): T[] {
-  const criteria = fields.filter((field) => values[field.id]);
+  const criteria = fields.filter((field) => values[field.id] && field.value);
 
   if (criteria.length === 0) {
     return rows;
   }
 
   return rows.filter((row) =>
-    criteria.every((field) => matchesField(field.value(row), values[field.id], field.match))
+    criteria.every((field) => matchesField(field.value!(row), values[field.id], field.match ?? 'contains'))
   );
 }
 
@@ -51,7 +56,7 @@ function matchesField(rawValue: string | string[] | null | undefined, query: str
 @Component({
   selector: 'app-filter',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatIconModule, FormDialog],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule, FormDialog, Dropdown, DatePicker],
   templateUrl: './filter.html',
   styleUrl: './filter.scss'
 })

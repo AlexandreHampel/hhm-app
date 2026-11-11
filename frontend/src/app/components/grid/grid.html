@@ -17,7 +17,9 @@
           *ngFor="let row of pagedRows; trackBy: trackByRow"
           tabindex="0"
           [class.selected]="isSelected(row)"
+          [class.disabled]="isDisabled(row)"
           [attr.aria-selected]="isSelected(row)"
+          [attr.aria-disabled]="isDisabled(row) || null"
           [attr.data-testid]="testIdPrefix + '-row-' + rowId(row)"
           (click)="toggleRow(row)"
           (keydown.enter)="toggleRow(row)"
@@ -44,7 +46,7 @@
 
   <app-pagination
     [testIdPrefix]="testIdPrefix"
-    [totalItems]="loading ? 0 : rows.length"
+    [totalItems]="loading ? 0 : (totalItems ?? rows.length)"
     [page]="page"
     [pageSize]="pageSize"
     [pageSizeOptions]="pageSizeOptions"

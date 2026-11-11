@@ -1,0 +1,69 @@
+
+<main class="visits-page" data-testid="visits-page">
+
+  <header class="page-header" data-testid="visits-header">
+    <button type="button" class="back-link" routerLink="/app" [skipLocationChange]="true" data-testid="visits-back-link">&larr; All Modules</button>
+    <h1 data-testid="visits-title">Patient Visits</h1>
+  </header>
+
+  <section class="toolbar" data-testid="visits-toolbar">
+    <div class="filters">
+      <app-filter
+        testIdPrefix="visits-filter"
+        title="Filter Visits"
+        [fields]="filterFields"
+        (filterChange)="changeFilter($event)">
+      </app-filter>
+    </div>
+
+    <div class="actions" role="toolbar" aria-label="Visit actions" data-testid="visits-actions">
+      <button type="button" class="button" routerLink="/visits/new" [skipLocationChange]="true" data-testid="visits-new-button">New Visit</button>
+      <button
+        type="button"
+        class="button secondary"
+        [disabled]="!selectedVisit"
+        [attr.title]="selectedVisit ? null : 'Select a visit to view its details'"
+        data-testid="visits-view-details-button"
+        (click)="viewDetails()">
+        View Details
+      </button>
+    </div>
+  </section>
+
+  <section class="list-section" data-testid="visits-list-section">
+    <app-grid
+      testIdPrefix="visits"
+      ariaLabel="Patient visits"
+      loadingMessage="Loading visits..."
+      [columns]="columns"
+      [rows]="visits"
+      [rowId]="visitId"
+      [loading]="loading"
+      [emptyMessage]="emptyMessage"
+      [totalItems]="total"
+      [(selectedRow)]="selectedVisit"
+      (pageRequest)="changePage($event)">
+
+      <ng-template appGridCell="admission-date" let-visit>{{ visit.admissionDate | date: 'dd/MM/yyyy HH:mm' }}</ng-template>
+
+      <ng-template appGridCell="status" let-visit>
+        <span
+          class="status-badge"
+          [ngClass]="statusOption(visit.status).key"
+          [attr.data-testid]="'visits-status-badge-' + visit._id">
+          {{ statusOption(visit.status).label }}
+        </span>
+      </ng-template>
+    </app-grid>
+  </section>
+
+  <app-message-dialog
+    *ngIf="errorMessage"
+    testIdPrefix="visits-error"
+    type="error"
+    title="Error"
+    [message]="errorMessage"
+    (confirm)="closeError()">
+  </app-message-dialog>
+
+</main>

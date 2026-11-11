@@ -2,6 +2,8 @@
 import { UpdateQuery } from 'mongoose';
 import { PeopleRepository } from './people.repository.js';
 import { PERSON_ROLES, Person, PersonRole } from './people.model.js';
+import { VisitsRepository } from '../visits/visits.repository.js';
+import { VisitMovementsRepository } from '../visit-movements/visit-movements.repository.js';
 
 export class PeopleError extends Error {
   constructor(message: string, public readonly statusCode: number) {
@@ -22,15 +24,17 @@ const EDITABLE_FIELDS = [
   'custom_roles'
 ] as const;
 
-const OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i;
+export const OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i;
 const CPF_PATTERN = /^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/;
-const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const ISO_DATE_TIME_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})$/;
+export const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+export const ISO_DATE_TIME_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_PATTERN = /^\+?[\d\s()-]+$/;
 
 export class PeopleService {
   private repository = new PeopleRepository();
+  private visitsRepository = new VisitsRepository();
+  private visitMovementsRepository = new VisitMovementsRepository();
 
   async create(data: unknown) {
     const payload = this.normalizePayload(this.toInput(data));
@@ -99,8 +103,20 @@ export class PeopleService {
   async delete(id: string) {
     this.validateId(id);
 
-    // Referential-integrity checks for dependent modules must be added here
-    // before deletion once modules referencing people are introduced.
+    // Referential integrity: people referenced by patient visits or visit
+    // movements must be kept so that the visit history remains available.
+    const [referencedByVisits, referencedByMovements] = await Promise.all([
+      this.visitsRepository.existsByPerson(id),
+      this.visitMovementsRepository.existsByProfessional(id)
+    ]);
+
+    if (referencedByVisits || referencedByMovements) {
+      throw new PeopleError(
+        'This person is referenced by patient visits and cannot be deleted',
+        409
+      );
+    }
+
     const person = await this.repository.delete(id);
 
     if (!person) {

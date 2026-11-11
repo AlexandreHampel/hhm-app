@@ -2,6 +2,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import peopleRoutes from '../modules/people/people.routes.js';
+import visitsRoutes from '../modules/visits/visits.routes.js';
 
 const app = express();
 
@@ -19,6 +20,15 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/api/people', peopleRoutes);
+app.use('/api/visits', visitsRoutes);
+
+// Unmatched API routes (including unsupported methods such as DELETE on visits
+// or any change to movements) use the same JSON error structure.
+app.use('/api', (req, res) => {
+  res.status(404).json({
+    message: `Route not found: ${req.method} ${req.originalUrl}`
+  });
+});
 
 app.use((error: Error & { status?: number; type?: string }, _req: Request, res: Response, _next: NextFunction) => {
   if (error.type === 'entity.parse.failed') {

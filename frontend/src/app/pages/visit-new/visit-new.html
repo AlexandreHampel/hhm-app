@@ -1,0 +1,139 @@
+
+<main class="visit-new-page" data-testid="visits-new-page">
+
+  <header class="page-header" data-testid="visits-new-header">
+    <button type="button" class="back-link" routerLink="/visits" [skipLocationChange]="true" data-testid="visits-new-back-link">&larr; Patient Visits</button>
+    <h1 data-testid="visits-new-title">New Visit</h1>
+  </header>
+
+  <app-loader *ngIf="loadingOptions" testId="visits-new-loading" message="Loading patients..."></app-loader>
+
+  <section *ngIf="!loadingOptions && optionsFailed" class="card state" data-testid="visits-new-load-error-state">
+    <p>Patients and professionals could not be loaded.</p>
+    <button type="button" class="button secondary" data-testid="visits-new-retry-button" (click)="loadOptions()">Try Again</button>
+  </section>
+
+  <form
+    *ngIf="!loadingOptions && !optionsFailed"
+    id="visits-form"
+    class="card"
+    [formGroup]="visitForm"
+    (ngSubmit)="save()"
+    novalidate
+    data-testid="visits-form">
+
+    <div class="form-grid">
+      <div class="field full">
+        <label for="visits-patient" data-testid="visits-patient-label">Patient *</label>
+        <app-finder
+          formControlName="patientId"
+          inputId="visits-patient"
+          testIdPrefix="visits-patient"
+          title="Find Patient"
+          placeholder="Select a patient"
+          emptyMessage="No patients found."
+          [items]="patients"
+          [columns]="patientColumns"
+          [searchFields]="searchFields"
+          [itemId]="personId"
+          [itemLabel]="personName"
+          [itemDisabled]="isUnavailable">
+        </app-finder>
+        <small *ngIf="hasError(visitForm.controls.patientId)" class="field-error" data-testid="visits-patient-validation-error">
+          {{ visitForm.controls.patientId.hasError('patientUnavailable') ? 'This patient already has an active visit.' : 'Patient is required.' }}
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="visits-type" data-testid="visits-type-label">Visit Type *</label>
+        <app-dropdown
+          formControlName="type"
+          inputId="visits-type"
+          testIdPrefix="visits-type"
+          placeholder="Select a type"
+          [options]="typeOptions">
+        </app-dropdown>
+        <small *ngIf="hasError(visitForm.controls.type)" class="field-error" data-testid="visits-type-validation-error">
+          Visit type is required.
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="visits-professional" data-testid="visits-professional-label">Responsible Professional</label>
+        <app-finder
+          formControlName="attendingProfessionalId"
+          inputId="visits-professional"
+          testIdPrefix="visits-professional"
+          title="Find Professional"
+          placeholder="Not assigned"
+          emptyMessage="No professionals found."
+          [clearable]="true"
+          [items]="professionalOptions"
+          [columns]="professionalColumns"
+          [searchFields]="searchFields"
+          [itemId]="personId"
+          [itemLabel]="personName">
+        </app-finder>
+      </div>
+
+      <div class="field">
+        <label for="visits-admission-date" data-testid="visits-admission-date-label">Admission Date and Time *</label>
+        <app-date-picker
+          mode="datetime"
+          inputId="visits-admission-date"
+          testIdPrefix="visits-admission-date"
+          formControlName="admissionDate"
+          [max]="maxAdmissionDate">
+        </app-date-picker>
+        <small *ngIf="hasError(visitForm.controls.admissionDate)" class="field-error" data-testid="visits-admission-date-validation-error">
+          {{ visitForm.controls.admissionDate.hasError('futureDate') ? 'Admission date cannot be in the future.' : 'Admission date and time are required.' }}
+        </small>
+      </div>
+
+      <div class="field full">
+        <label for="visits-chief-complaint" data-testid="visits-chief-complaint-label">Chief Complaint *</label>
+        <textarea
+          id="visits-chief-complaint"
+          formControlName="chiefComplaint"
+          [attr.maxlength]="chiefComplaintMaxLength"
+          data-testid="visits-chief-complaint-input"></textarea>
+        <small *ngIf="hasError(visitForm.controls.chiefComplaint)" class="field-error" data-testid="visits-chief-complaint-validation-error">
+          {{ visitForm.controls.chiefComplaint.hasError('maxlength') ? 'Chief complaint must have at most ' + chiefComplaintMaxLength + ' characters.' : 'Chief complaint is required.' }}
+        </small>
+      </div>
+
+      <div class="field full">
+        <label for="visits-notes" data-testid="visits-notes-label">Notes</label>
+        <textarea
+          id="visits-notes"
+          formControlName="notes"
+          [attr.maxlength]="notesMaxLength"
+          data-testid="visits-notes-input"></textarea>
+        <small *ngIf="hasError(visitForm.controls.notes)" class="field-error" data-testid="visits-notes-validation-error">
+          Notes must have at most {{ notesMaxLength }} characters.
+        </small>
+      </div>
+    </div>
+
+    <p *ngIf="submitted && visitForm.invalid" class="field-error summary" role="alert" data-testid="visits-form-validation-error">
+      Please correct the highlighted fields before saving.
+    </p>
+
+    <footer class="form-actions">
+      <button type="button" class="button secondary" routerLink="/visits" [skipLocationChange]="true" data-testid="visits-cancel-button">Cancel</button>
+      <button type="submit" class="button" [disabled]="saving" data-testid="visits-save-button">
+        {{ saving ? 'Saving...' : 'Save Visit' }}
+      </button>
+    </footer>
+  </form>
+
+  <app-message-dialog
+    *ngIf="errorMessage"
+    testIdPrefix="visits-new-error"
+    type="error"
+    title="Error"
+    [message]="errorMessage"
+    (confirm)="closeError()">
+  </app-message-dialog>
+
+</main>

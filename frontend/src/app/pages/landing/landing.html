@@ -14,11 +14,17 @@
     <a href="#about">About</a>
   </nav>
 
-  <a mat-stroked-button class="nav-button" href="/login">
+  <button
+    mat-stroked-button
+    type="button"
+    class="nav-button"
+    routerLink="/app"
+    [skipLocationChange]="true"
+    data-testid="landing-access-system-header-button">
     <mat-icon>person_outline</mat-icon>
     Access System
     <mat-icon>arrow_forward</mat-icon>
-  </a>
+  </button>
 </header>
 
 <main>
@@ -42,10 +48,16 @@
       </p>
 
       <div class="actions">
-        <a mat-flat-button class="primary-button" href="/login">
+        <button
+          mat-flat-button
+          type="button"
+          class="primary-button"
+          routerLink="/app"
+          [skipLocationChange]="true"
+          data-testid="landing-access-system-button">
           Access System
           <mat-icon>arrow_forward</mat-icon>
-        </a>
+        </button>
 
         <a mat-stroked-button class="secondary-button" href="#features">
           Explore Features

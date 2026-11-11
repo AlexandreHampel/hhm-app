@@ -30,7 +30,23 @@
         <label [for]="testIdPrefix + '-' + field.id" [attr.data-testid]="testIdPrefix + '-' + field.id + '-label'">
           {{ field.label }}
         </label>
+        <app-date-picker
+          *ngIf="field.type === 'date'"
+          [inputId]="testIdPrefix + '-' + field.id"
+          [testIdPrefix]="testIdPrefix + '-' + field.id"
+          [formControlName]="field.id">
+        </app-date-picker>
+        <app-dropdown
+          *ngIf="field.type === 'select'"
+          [inputId]="testIdPrefix + '-' + field.id"
+          [testIdPrefix]="testIdPrefix + '-' + field.id"
+          [options]="field.options ?? []"
+          placeholder="Any"
+          [placeholderSelectable]="true"
+          [formControlName]="field.id">
+        </app-dropdown>
         <input
+          *ngIf="field.type !== 'date' && field.type !== 'select'"
           [id]="testIdPrefix + '-' + field.id"
           [type]="field.type ?? 'text'"
           [attr.inputmode]="field.inputMode ?? null"

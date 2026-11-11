@@ -1,0 +1,139 @@
+<div class="date-input" [class.disabled]="disabled">
+  <input
+    [attr.id]="inputId"
+    [type]="inputType"
+    [value]="value"
+    [attr.min]="min"
+    [attr.max]="max"
+    [disabled]="disabled"
+    [attr.data-testid]="testIdPrefix + '-input'"
+    (input)="onInput($any($event.target).value)"
+    (blur)="touch()">
+
+  <button
+    #calendarButton
+    type="button"
+    class="calendar-button"
+    aria-label="Open calendar"
+    aria-haspopup="dialog"
+    [attr.aria-expanded]="isOpen"
+    [disabled]="disabled"
+    [attr.data-testid]="testIdPrefix + '-calendar-button'"
+    (click)="toggle()">
+    <mat-icon aria-hidden="true">calendar_month</mat-icon>
+  </button>
+</div>
+
+<section
+  *ngIf="isOpen"
+  #panel
+  class="calendar"
+  role="dialog"
+  aria-label="Calendar"
+  [style.top.px]="panelTop"
+  [style.left.px]="panelLeft"
+  [attr.data-testid]="testIdPrefix + '-calendar'">
+
+  <header>
+    <button
+      type="button"
+      class="nav"
+      aria-label="Previous month"
+      [attr.data-testid]="testIdPrefix + '-calendar-previous-button'"
+      (click)="previousMonth()">
+      &lsaquo;
+    </button>
+    <app-dropdown
+      class="month"
+      size="compact"
+      ariaLabel="Month"
+      [testIdPrefix]="testIdPrefix + '-calendar-month'"
+      [options]="monthOptions"
+      [value]="viewMonth.toString()"
+      (valueChange)="changeMonth($event)">
+    </app-dropdown>
+    <app-dropdown
+      class="year"
+      size="compact"
+      ariaLabel="Year"
+      [testIdPrefix]="testIdPrefix + '-calendar-year'"
+      [options]="yearOptions"
+      [value]="viewYear.toString()"
+      (valueChange)="changeYear($event)">
+    </app-dropdown>
+    <button
+      type="button"
+      class="nav"
+      aria-label="Next month"
+      [attr.data-testid]="testIdPrefix + '-calendar-next-button'"
+      (click)="nextMonth()">
+      &rsaquo;
+    </button>
+  </header>
+
+  <div class="weekdays" aria-hidden="true">
+    <span *ngFor="let weekday of weekdays">{{ weekday }}</span>
+  </div>
+
+  <div class="days">
+    <button
+      *ngFor="let day of days; trackBy: trackByIso"
+      type="button"
+      class="day"
+      [class.outside]="!day.inMonth"
+      [class.today]="day.today"
+      [class.selected]="day.selected"
+      [disabled]="day.disabled"
+      [attr.aria-pressed]="day.selected"
+      [attr.aria-label]="day.iso"
+      [attr.data-testid]="testIdPrefix + '-calendar-day-' + day.iso"
+      (click)="selectDay(day)">
+      {{ day.day }}
+    </button>
+  </div>
+
+  <div *ngIf="mode === 'datetime'" class="time">
+    <mat-icon aria-hidden="true">schedule</mat-icon>
+    <app-dropdown
+      size="compact"
+      ariaLabel="Hour"
+      placeholder="--"
+      [testIdPrefix]="testIdPrefix + '-calendar-hour'"
+      [options]="hourOptions"
+      [value]="hour"
+      (valueChange)="changeHour($event)">
+    </app-dropdown>
+    <span class="separator">:</span>
+    <app-dropdown
+      size="compact"
+      ariaLabel="Minute"
+      placeholder="--"
+      [testIdPrefix]="testIdPrefix + '-calendar-minute'"
+      [options]="minuteOptions"
+      [value]="minute"
+      (valueChange)="changeMinute($event)">
+    </app-dropdown>
+  </div>
+
+  <footer>
+    <button type="button" class="link" [attr.data-testid]="testIdPrefix + '-calendar-clear-button'" (click)="clear()">
+      Clear
+    </button>
+    <button
+      type="button"
+      class="link"
+      [disabled]="todayDisabled"
+      [attr.data-testid]="testIdPrefix + '-calendar-today-button'"
+      (click)="selectToday()">
+      {{ mode === 'datetime' ? 'Now' : 'Today' }}
+    </button>
+    <button
+      *ngIf="mode === 'datetime'"
+      type="button"
+      class="done"
+      [attr.data-testid]="testIdPrefix + '-calendar-done-button'"
+      (click)="close()">
+      Done
+    </button>
+  </footer>
+</section>

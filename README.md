@@ -189,6 +189,27 @@ Checks whether the API is responding.
 
 The health check verifies API availability but does not independently validate database health.
 
+### People General Registration (People)
+
+People associated with the hospital (doctors, nurses, nursing technicians, patients, and custom roles) are registered in the `people` collection through `/api/people`. See [`backend/README.MD`](backend/README.MD) for endpoints, validation rules, and error responses.
+
+### Patient Visits
+
+Patient visits (`/api/visits`) and their append-only movement history (`/api/visits/id/:id/movements`) reference existing `people` records and never copy personal data. See [`backend/README.MD`](../backend/README.MD) for the endpoints, payloads, filters, status transitions, and error responses.
+
+## 🧭 Application Routes
+
+Only the landing page (`/`) can be opened by URL. The application is entered through **Access System** on the landing page, and every other route is internal: navigation does not change the address bar (`skipLocationChange`), navigation controls render no URLs, and opening an internal route directly (typed URL, bookmark, reload or browser history) redirects to the landing page (`guards/internal-navigation.guard.ts`).
+
+| Route | Page |
+|---|---|
+| `/` | Landing page |
+| `/app` (internal) | Module dashboard, opened from **Access System** on the landing page, generated from the module registry in `frontend/src/app/config/modules.ts` |
+| `/people` (internal) | People General Registration: list people by role and create, edit, or delete records |
+| `/visits` (internal) | Patient Visits: paginated visit list with filters by patient, type, status and admission date range |
+| `/visits/new` (internal) | New Visit: open a visit for an existing patient. Patients with an active visit are shown as unavailable |
+| `/visits/id/:id` (internal) | Visit Details: summary, editing of active visits, and the chronological movement timeline. Discharge and cancellation require confirmation |
+
 ## 🔒 Security
 
 HHM is designed with security and maintainability in mind.

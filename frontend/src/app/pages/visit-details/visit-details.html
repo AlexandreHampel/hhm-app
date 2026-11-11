@@ -1,0 +1,385 @@
+
+<main class="visit-details-page" data-testid="visits-details-page">
+
+  <header class="page-header" data-testid="visits-details-header">
+    <button type="button" class="back-link" routerLink="/visits" [skipLocationChange]="true" data-testid="visits-details-back-link">&larr; Patient Visits</button>
+    <div class="title-row">
+      <h1 data-testid="visits-details-title">Visit Details</h1>
+      <span
+        *ngIf="visit"
+        class="status-badge"
+        [ngClass]="statusOption(visit.status).key"
+        data-testid="visits-details-status">
+        {{ statusOption(visit.status).label }}
+      </span>
+    </div>
+  </header>
+
+  <app-loader *ngIf="loading" testId="visits-details-loading" message="Loading visit..."></app-loader>
+
+  <section *ngIf="!loading && notFound" class="card state" role="alert" data-testid="visits-details-not-found">
+    <p>The visit was not found.</p>
+    <button type="button" class="button secondary" routerLink="/visits" [skipLocationChange]="true" data-testid="visits-details-not-found-back-button">Back to Patient Visits</button>
+  </section>
+
+  <section *ngIf="!loading && loadFailed" class="card state" role="alert" data-testid="visits-details-load-error-state">
+    <p>The visit could not be loaded.</p>
+    <button type="button" class="button secondary" data-testid="visits-details-retry-button" (click)="load()">Try Again</button>
+  </section>
+
+  <ng-container *ngIf="!loading && visit">
+    <p *ngIf="!isActive" class="closed-notice" role="status" data-testid="visits-details-closed-notice">
+      {{ visit.status === 'COMPLETED' ? 'Completed' : 'Cancelled' }} on {{ visit.closedAt | date: 'dd/MM/yyyy HH:mm' }}. Read-only.
+    </p>
+
+    <section class="card" aria-labelledby="visits-details-summary-title" data-testid="visits-details-summary">
+      <div class="card-header">
+        <h2 id="visits-details-summary-title" data-testid="visits-details-summary-title">Summary</h2>
+        <button
+          *ngIf="isActive"
+          type="button"
+          class="button secondary"
+          data-testid="visits-edit-button"
+          (click)="openEdit()">
+          Edit Visit
+        </button>
+      </div>
+
+      <dl class="summary-grid">
+        <div class="wide">
+          <dt>Patient</dt>
+          <dd data-testid="visits-details-patient">
+            {{ visit.patient?.name ?? 'Unknown patient' }}
+            <span *ngIf="visit.patient" class="hint">· CPF {{ visit.patient.cpf | cpf }}</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Type</dt>
+          <dd data-testid="visits-details-type">{{ typeOption(visit.type).label }}</dd>
+        </div>
+        <div>
+          <dt>Admission</dt>
+          <dd data-testid="visits-details-admission-date">{{ visit.admissionDate | date: 'dd/MM/yyyy HH:mm' }}</dd>
+        </div>
+        <div>
+          <dt>Responsible Professional</dt>
+          <dd data-testid="visits-details-professional">{{ visit.attendingProfessional?.name ?? 'Not assigned' }}</dd>
+        </div>
+        <div>
+          <dt>Closed At</dt>
+          <dd data-testid="visits-details-closed-at">{{ visit.closedAt ? (visit.closedAt | date: 'dd/MM/yyyy HH:mm') : '—' }}</dd>
+        </div>
+        <div class="wide">
+          <dt>Chief Complaint</dt>
+          <dd class="text" data-testid="visits-details-chief-complaint">{{ visit.chiefComplaint }}</dd>
+        </div>
+        <div class="wide">
+          <dt>Notes</dt>
+          <dd class="text" data-testid="visits-details-notes">{{ visit.notes || '—' }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="card" aria-labelledby="visits-movement-title" data-testid="visits-movement-section">
+      <div class="card-header">
+        <div>
+          <h2 id="visits-movement-title" data-testid="visits-movement-title">Movement History</h2>
+          <p *ngIf="currentDepartment" class="hint" data-testid="visits-details-current-department">
+            Current department: {{ currentDepartment }}
+          </p>
+        </div>
+        <button
+          *ngIf="isActive"
+          type="button"
+          class="button"
+          data-testid="visits-movement-add-button"
+          (click)="openMovement()">
+          Add Movement
+        </button>
+      </div>
+
+      <p *ngIf="movements.length === 0" class="hint" data-testid="visits-movement-timeline-empty">
+        No movements recorded yet.
+      </p>
+
+      <ol *ngIf="movements.length > 0" class="timeline" aria-label="Movement history" data-testid="visits-movement-timeline">
+        <li
+          *ngFor="let movement of movements; trackBy: trackById"
+          class="timeline-entry"
+          [ngClass]="movementOption(movement.type).key"
+          [attr.data-testid]="'visits-movement-entry-' + movement._id">
+          <div class="entry-header">
+            <span class="movement-type" [attr.data-testid]="'visits-movement-entry-type-' + movement._id">
+              {{ movementOption(movement.type).label }}
+            </span>
+            <time [attr.datetime]="movement.occurredAt" [attr.data-testid]="'visits-movement-entry-occurred-at-' + movement._id">
+              {{ movement.occurredAt | date: 'dd/MM/yyyy HH:mm' }}
+            </time>
+          </div>
+          <p
+            *ngIf="movement.departmentFrom || movement.departmentTo"
+            [attr.data-testid]="'visits-movement-entry-departments-' + movement._id">
+            {{ movement.departmentFrom || 'Unknown department' }} &rarr; {{ movement.departmentTo || 'Unknown department' }}
+          </p>
+          <p
+            *ngIf="movement.responsibleProfessional"
+            [attr.data-testid]="'visits-movement-entry-professional-' + movement._id">
+            Professional: {{ movement.responsibleProfessional.name }}
+          </p>
+          <p
+            *ngIf="movement.description"
+            class="text"
+            [attr.data-testid]="'visits-movement-entry-description-' + movement._id">
+            {{ movement.description }}
+          </p>
+          <small class="hint" [attr.data-testid]="'visits-movement-entry-recorded-at-' + movement._id">
+            Recorded {{ movement.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+          </small>
+        </li>
+      </ol>
+    </section>
+  </ng-container>
+
+  <app-form-dialog
+    *ngIf="editOpen && visit"
+    testIdPrefix="visits-edit"
+    formId="visits-edit-form"
+    title="Edit Visit"
+    [busy]="savingEdit"
+    (cancel)="closeEdit()">
+
+    <form id="visits-edit-form" [formGroup]="editForm" (ngSubmit)="saveEdit()" novalidate data-testid="visits-edit-form">
+      <div class="form-grid">
+        <div class="field full">
+          <span class="label">Patient</span>
+          <p class="readonly-value" data-testid="visits-edit-patient">{{ visit.patient?.name ?? 'Unknown patient' }}</p>
+        </div>
+
+        <div class="field">
+          <label for="visits-edit-type" data-testid="visits-edit-type-label">Visit Type *</label>
+          <app-dropdown
+            formControlName="type"
+            inputId="visits-edit-type"
+            testIdPrefix="visits-edit-type"
+            [options]="typeOptions">
+          </app-dropdown>
+          <small *ngIf="hasError(editForm.controls.type, editSubmitted)" class="field-error" data-testid="visits-edit-type-validation-error">
+            Visit type is required.
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="visits-edit-professional" data-testid="visits-edit-professional-label">Responsible Professional</label>
+          <app-finder
+            formControlName="attendingProfessionalId"
+            inputId="visits-edit-professional"
+            testIdPrefix="visits-edit-professional"
+            title="Find Professional"
+            placeholder="Not assigned"
+            emptyMessage="No professionals found."
+            [clearable]="true"
+            [selectedLabel]="visit.attendingProfessional?.name ?? null"
+            [items]="professionalOptions"
+            [columns]="professionalColumns"
+            [searchFields]="searchFields"
+            [itemId]="personId"
+            [itemLabel]="personName">
+          </app-finder>
+        </div>
+
+        <div class="field full">
+          <label for="visits-edit-chief-complaint" data-testid="visits-edit-chief-complaint-label">Chief Complaint *</label>
+          <textarea
+            id="visits-edit-chief-complaint"
+            formControlName="chiefComplaint"
+            [attr.maxlength]="chiefComplaintMaxLength"
+            data-testid="visits-edit-chief-complaint-input"></textarea>
+          <small *ngIf="hasError(editForm.controls.chiefComplaint, editSubmitted)" class="field-error" data-testid="visits-edit-chief-complaint-validation-error">
+            Chief complaint is required.
+          </small>
+        </div>
+
+        <div class="field full">
+          <label for="visits-edit-notes" data-testid="visits-edit-notes-label">Notes</label>
+          <textarea
+            id="visits-edit-notes"
+            formControlName="notes"
+            [attr.maxlength]="notesMaxLength"
+            data-testid="visits-edit-notes-input"></textarea>
+        </div>
+      </div>
+
+      <p *ngIf="editSubmitted && editForm.invalid" class="field-error summary" role="alert" data-testid="visits-edit-form-validation-error">
+        Please correct the highlighted fields before saving.
+      </p>
+    </form>
+  </app-form-dialog>
+
+  <app-form-dialog
+    *ngIf="movementOpen"
+    testIdPrefix="visits-movement"
+    formId="visits-movement-form"
+    title="Add Movement"
+    submitLabel="Record Movement"
+    busyLabel="Recording..."
+    [busy]="savingMovement"
+    (cancel)="closeMovement()">
+
+    <form id="visits-movement-form" [formGroup]="movementForm" (ngSubmit)="submitMovement()" novalidate data-testid="visits-movement-form">
+      <div class="form-grid">
+        <div class="field">
+          <label for="visits-movement-type" data-testid="visits-movement-type-label">Movement Type *</label>
+          <app-dropdown
+            formControlName="type"
+            inputId="visits-movement-type"
+            testIdPrefix="visits-movement-type"
+            placeholder="Select a type"
+            [options]="movementTypeOptions">
+          </app-dropdown>
+          <small *ngIf="hasError(movementForm.controls.type, movementSubmitted)" class="field-error" data-testid="visits-movement-type-validation-error">
+            Movement type is required.
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="visits-movement-professional" data-testid="visits-movement-professional-label">Responsible Professional</label>
+          <app-finder
+            formControlName="responsibleProfessionalId"
+            inputId="visits-movement-professional"
+            testIdPrefix="visits-movement-professional"
+            title="Find Professional"
+            placeholder="Not informed"
+            emptyMessage="No professionals found."
+            [clearable]="true"
+            [items]="professionalOptions"
+            [columns]="professionalColumns"
+            [searchFields]="searchFields"
+            [itemId]="personId"
+            [itemLabel]="personName">
+          </app-finder>
+        </div>
+
+        <div class="field full">
+          <label class="checkbox" data-testid="visits-movement-use-current-time-label">
+            <input type="checkbox" formControlName="useCurrentTime" data-testid="visits-movement-use-current-time-checkbox">
+            Use the current date and time
+          </label>
+        </div>
+
+        <div *ngIf="!movementForm.controls.useCurrentTime.value" class="field full">
+          <label for="visits-movement-occurred-at" data-testid="visits-movement-occurred-at-label">Occurred At *</label>
+          <app-date-picker
+            mode="datetime"
+            inputId="visits-movement-occurred-at"
+            testIdPrefix="visits-movement-occurred-at"
+            formControlName="occurredAt"
+            [min]="minimumOccurredAtLocal"
+            [max]="nowLocal">
+          </app-date-picker>
+          <small *ngIf="hasGroupError('occurredAtRequired')" class="field-error" data-testid="visits-movement-occurred-at-required-validation-error">
+            Date and time are required.
+          </small>
+          <small *ngIf="hasGroupError('occurredAtTooEarly')" class="field-error" data-testid="visits-movement-occurred-at-too-early-validation-error">
+            The movement cannot be earlier than {{ minimumOccurredAt | date: 'dd/MM/yyyy HH:mm:ss' }}.
+          </small>
+          <small *ngIf="hasError(movementForm.controls.occurredAt, movementSubmitted)" class="field-error" data-testid="visits-movement-occurred-at-future-validation-error">
+            The movement cannot be in the future.
+          </small>
+        </div>
+
+        <ng-container *ngIf="movementType === 'DEPARTMENT_TRANSFER'">
+          <div class="field">
+            <label for="visits-movement-department-from" data-testid="visits-movement-department-from-label">Origin Department</label>
+            <input
+              *ngIf="currentDepartment; else originInput"
+              id="visits-movement-department-from"
+              type="text"
+              [value]="currentDepartment"
+              readonly
+              data-testid="visits-movement-department-from-input">
+            <ng-template #originInput>
+              <input
+                id="visits-movement-department-from"
+                type="text"
+                formControlName="departmentFrom"
+                [attr.maxlength]="departmentMaxLength"
+                placeholder="Optional when unknown"
+                autocomplete="off"
+                data-testid="visits-movement-department-from-input">
+            </ng-template>
+          </div>
+
+          <div class="field">
+            <label for="visits-movement-department-to" data-testid="visits-movement-department-to-label">Destination Department *</label>
+            <input
+              id="visits-movement-department-to"
+              type="text"
+              formControlName="departmentTo"
+              [attr.maxlength]="departmentMaxLength"
+              autocomplete="off"
+              data-testid="visits-movement-department-to-input">
+            <small *ngIf="hasGroupError('departmentToRequired')" class="field-error" data-testid="visits-movement-department-to-validation-error">
+              Destination department is required for a transfer.
+            </small>
+            <small *ngIf="hasGroupError('sameDepartment')" class="field-error" data-testid="visits-movement-same-department-validation-error">
+              The destination must be different from the origin department.
+            </small>
+          </div>
+        </ng-container>
+
+        <div class="field full">
+          <label for="visits-movement-description" data-testid="visits-movement-description-label">
+            Description{{ movementType === 'OTHER' ? ' *' : '' }}
+          </label>
+          <textarea
+            id="visits-movement-description"
+            formControlName="description"
+            [attr.maxlength]="descriptionMaxLength"
+            [placeholder]="movementType === 'OTHER' ? 'Describe the movement' : 'Optional'"
+            data-testid="visits-movement-description-input"></textarea>
+          <small *ngIf="hasGroupError('descriptionRequired')" class="field-error" data-testid="visits-movement-description-validation-error">
+            Description is required for movements of type Other.
+          </small>
+        </div>
+      </div>
+
+      <p *ngIf="movementSubmitted && movementForm.invalid" class="field-error summary" role="alert" data-testid="visits-movement-form-validation-error">
+        Please correct the highlighted fields before recording the movement.
+      </p>
+    </form>
+  </app-form-dialog>
+
+  <app-message-dialog
+    *ngIf="pendingMovement"
+    testIdPrefix="visits-movement-confirm"
+    type="warning"
+    [title]="confirmationTitle"
+    [message]="confirmationMessage"
+    [confirmLabel]="pendingMovement.type === 'DISCHARGE' ? 'Discharge' : 'Cancel Visit'"
+    confirmAction="proceed"
+    cancelLabel="Back"
+    busyLabel="Recording..."
+    [busy]="savingMovement"
+    (confirm)="confirmClosingMovement()"
+    (cancel)="cancelClosingMovement()">
+  </app-message-dialog>
+
+  <app-message-dialog
+    *ngIf="successMessage"
+    testIdPrefix="visits-details-success"
+    type="success"
+    title="Success"
+    [message]="successMessage"
+    (confirm)="closeSuccess()">
+  </app-message-dialog>
+
+  <app-message-dialog
+    *ngIf="errorMessage"
+    testIdPrefix="visits-details-error"
+    type="error"
+    title="Error"
+    [message]="errorMessage"
+    (confirm)="closeError()">
+  </app-message-dialog>
+
+</main>

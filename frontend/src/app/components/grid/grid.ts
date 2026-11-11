@@ -4,6 +4,11 @@ import { Loader } from '../loader/loader';
 import { Pagination } from '../pagination/pagination';
 import { GridCell, GridCellContext } from './grid-cell';
 
+export interface GridPageRequest {
+  page: number;
+  pageSize: number;
+}
+
 export interface GridColumn<T> {
   id: string;
   header: string;
@@ -30,8 +35,14 @@ export class Grid<T> implements OnChanges, AfterContentInit {
   @Input() ariaLabel = 'Records';
   @Input() selectedRow: T | null = null;
   @Input() pageSizeOptions: number[] = [5, 10, 25, 50];
+  // Server-side pagination: when set, rows are the current page already loaded
+  // and page changes are emitted for the parent to load the requested page.
+  @Input() totalItems: number | null = null;
+  // Rows that are shown but cannot be selected.
+  @Input() rowDisabled: ((row: T) => boolean) | null = null;
 
   @Output() selectedRowChange = new EventEmitter<T | null>();
+  @Output() pageRequest = new EventEmitter<GridPageRequest>();
 
   @ContentChildren(GridCell) cellTemplates?: QueryList<GridCell>;
 
@@ -52,6 +63,10 @@ export class Grid<T> implements OnChanges, AfterContentInit {
     this.collectTemplates();
   }
 
+  get isServerSide(): boolean {
+    return this.totalItems !== null;
+  }
+
   resetPage(): void {
     this.page = 1;
     this.updatePage();
@@ -61,6 +76,7 @@ export class Grid<T> implements OnChanges, AfterContentInit {
     this.page = page;
     this.updatePage();
     this.clearHiddenSelection();
+    this.emitPageRequest();
   }
 
   changePageSize(pageSize: number): void {
@@ -68,10 +84,19 @@ export class Grid<T> implements OnChanges, AfterContentInit {
     this.page = 1;
     this.updatePage();
     this.clearHiddenSelection();
+    this.emitPageRequest();
   }
 
   toggleRow(row: T): void {
+    if (this.isDisabled(row)) {
+      return;
+    }
+
     this.selectedRowChange.emit(this.isSelected(row) ? null : row);
+  }
+
+  isDisabled(row: T): boolean {
+    return this.rowDisabled?.(row) ?? false;
   }
 
   isSelected(row: T): boolean {
@@ -92,7 +117,18 @@ export class Grid<T> implements OnChanges, AfterContentInit {
 
   trackByRow = (_index: number, row: T): string => this.rowId(row);
 
+  private emitPageRequest(): void {
+    if (this.isServerSide) {
+      this.pageRequest.emit({ page: this.page, pageSize: this.pageSize });
+    }
+  }
+
   private updatePage(): void {
+    if (this.isServerSide) {
+      this.pagedRows = this.rows;
+      return;
+    }
+
     const totalPages = Math.max(1, Math.ceil(this.rows.length / this.pageSize));
     this.page = Math.min(this.page, totalPages);
 

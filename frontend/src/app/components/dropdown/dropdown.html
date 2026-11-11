@@ -1,0 +1,24 @@
+<select
+  [class.compact]="size === 'compact'"
+  [attr.id]="inputId"
+  [attr.aria-label]="ariaLabel"
+  [disabled]="disabled"
+  [attr.data-testid]="testIdPrefix + '-select'"
+  (change)="select($any($event.target).value)"
+  (blur)="touch()">
+  <option
+    *ngIf="placeholder !== null"
+    value=""
+    [disabled]="!placeholderSelectable"
+    [selected]="value === ''"
+    [attr.data-testid]="testIdPrefix + '-option-placeholder'">
+    {{ placeholder }}
+  </option>
+  <option
+    *ngFor="let option of options; trackBy: trackByValue"
+    [value]="option.value"
+    [selected]="option.value === value"
+    [attr.data-testid]="testIdPrefix + '-option-' + option.key">
+    {{ option.label }}
+  </option>
+</select>

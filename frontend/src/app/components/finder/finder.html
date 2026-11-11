@@ -1,0 +1,108 @@
+<div class="finder" [class.disabled]="disabled" [attr.data-testid]="testIdPrefix + '-finder'">
+  <input
+    type="text"
+    readonly
+    [attr.id]="inputId"
+    [value]="displayValue"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [attr.data-testid]="testIdPrefix + '-input'"
+    (click)="open()"
+    (keydown.enter)="$event.preventDefault(); open()">
+
+  <div class="actions">
+    <button
+      *ngIf="clearable && value && !disabled"
+      type="button"
+      class="icon-button"
+      aria-label="Clear"
+      [attr.data-testid]="testIdPrefix + '-clear-button'"
+      (click)="clear()">
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+
+    <button
+      type="button"
+      class="icon-button"
+      [attr.aria-label]="title"
+      [title]="title"
+      [disabled]="disabled"
+      [attr.data-testid]="testIdPrefix + '-open-button'"
+      (click)="open()">
+      <mat-icon aria-hidden="true">search</mat-icon>
+    </button>
+  </div>
+</div>
+
+<app-form-dialog
+  *ngIf="isOpen"
+  [testIdPrefix]="testIdPrefix + '-finder'"
+  [formId]="testIdPrefix + '-finder-selection-form'"
+  [title]="title"
+  submitLabel="Select"
+  submitAction="select"
+  (cancel)="close()">
+
+  <!-- Both forms are nested inside other forms: keep their submit events from reaching them. -->
+  <form
+    [id]="testIdPrefix + '-finder-search-form'"
+    [formGroup]="searchForm"
+    (ngSubmit)="search()"
+    (submit)="$event.stopPropagation()"
+    novalidate
+    [attr.data-testid]="testIdPrefix + '-finder-search-form'">
+    <div class="search-row">
+      <div *ngFor="let field of searchFields; trackBy: trackByField" class="field">
+        <label [for]="testIdPrefix + '-finder-' + field.id" [attr.data-testid]="testIdPrefix + '-finder-' + field.id + '-label'">
+          {{ field.label }}
+        </label>
+        <input
+          [id]="testIdPrefix + '-finder-' + field.id"
+          type="text"
+          [attr.inputmode]="field.inputMode ?? null"
+          [attr.placeholder]="field.placeholder ?? null"
+          [formControlName]="field.id"
+          autocomplete="off"
+          [attr.data-testid]="testIdPrefix + '-finder-' + field.id + '-input'">
+      </div>
+
+      <button type="submit" class="search-button" [attr.data-testid]="testIdPrefix + '-finder-search-button'">
+        Search
+      </button>
+    </div>
+
+    <small
+      *ngIf="searchError"
+      class="field-error"
+      role="alert"
+      [attr.data-testid]="testIdPrefix + '-finder-search-validation-error'">
+      Enter at least {{ minSearchLength }} characters.
+    </small>
+  </form>
+
+  <form
+    [id]="testIdPrefix + '-finder-selection-form'"
+    class="results"
+    (submit)="$event.preventDefault(); $event.stopPropagation(); confirm()"
+    [attr.data-testid]="testIdPrefix + '-finder-selection-form'">
+    <app-grid
+      [testIdPrefix]="testIdPrefix + '-finder'"
+      [ariaLabel]="title"
+      [columns]="columns"
+      [rows]="results"
+      [rowId]="itemId"
+      [rowDisabled]="isItemDisabled"
+      [emptyMessage]="searched ? emptyMessage : ''"
+      [pageSizeOptions]="[5, 10]"
+      [(selectedRow)]="selectedItem">
+    </app-grid>
+  </form>
+
+  <small
+    *ngIf="submitted && !selectedItem"
+    class="field-error"
+    role="alert"
+    [attr.data-testid]="testIdPrefix + '-finder-selection-validation-error'">
+    Select a record.
+  </small>
+</app-form-dialog>

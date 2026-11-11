@@ -1,0 +1,146 @@
+$surface-light: #1c1c24;
+$royal-blue: #4169e1;
+$royal-blue-hover: #5b82ff;
+$text-primary: #f5f7fa;
+$text-secondary: #9ca3af;
+$border: #27272f;
+$danger: #f87171;
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.finder {
+  position: relative;
+
+  input {
+    padding-right: 84px;
+    cursor: pointer;
+  }
+
+  &.disabled input {
+    cursor: not-allowed;
+  }
+}
+
+input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid $border;
+  border-radius: 10px;
+  background: $surface-light;
+  color: $text-primary;
+  font: inherit;
+  font-size: 14px;
+
+  &:focus {
+    outline: none;
+    border-color: $royal-blue;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+:host(.ng-invalid.ng-touched) .finder input {
+  border-color: $danger;
+}
+
+.actions {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: flex;
+  gap: 2px;
+  transform: translateY(-50%);
+}
+
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: $text-secondary;
+  cursor: pointer;
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    color: $royal-blue-hover;
+    outline: none;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.search-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+label {
+  color: $text-secondary;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.search-button {
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid $royal-blue;
+  border-radius: 10px;
+  background: $royal-blue;
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: $royal-blue-hover;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $royal-blue-hover;
+    outline-offset: 2px;
+  }
+}
+
+.results {
+  display: flex;
+  margin-top: 16px;
+
+  app-grid {
+    flex: 1;
+    min-height: 280px;
+  }
+}
+
+.field-error {
+  display: block;
+  margin-top: 8px;
+  color: $danger;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .search-row {
+    grid-template-columns: 1fr;
+  }
+}

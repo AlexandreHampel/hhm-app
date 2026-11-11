@@ -10,6 +10,8 @@ import { PERSON_ROLES, Person, PersonPayload, PersonRole, PersonRoleOption } fro
 import { PeopleService } from '../../services/people.service';
 import { LoaderService } from '../../services/loader.service';
 import { CrudToolbar } from '../../components/crud-toolbar/crud-toolbar';
+import { DatePicker } from '../../components/date-picker/date-picker';
+import { Dropdown } from '../../components/dropdown/dropdown';
 import { Filter, FilterField, FilterValues, filterRows } from '../../components/filter/filter';
 import { FormDialog } from '../../components/form-dialog/form-dialog';
 import { Grid, GridColumn } from '../../components/grid/grid';
@@ -18,6 +20,7 @@ import { Loader } from '../../components/loader/loader';
 import { MessageDialog } from '../../components/message-dialog/message-dialog';
 import { CpfPipe } from '../../pipes/cpf';
 import { PhonePipe } from '../../pipes/phone';
+import { requiredTrimmedValidator } from '../../validators/form-validators';
 
 type CustomRoleForm = FormGroup<{
   clientId: FormControl<number>;
@@ -27,10 +30,6 @@ type CustomRoleForm = FormGroup<{
 const CPF_PATTERN = /^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_PATTERN = /^\+?[\d\s()-]+$/;
-
-function requiredTrimmedValidator(control: AbstractControl<string>): ValidationErrors | null {
-  return control.value?.trim() ? null : { required: true };
-}
 
 function cpfValidator(control: AbstractControl<string>): ValidationErrors | null {
   const cpf = control.value?.trim() ?? '';
@@ -116,7 +115,7 @@ function customRolesRequiredValidator(control: AbstractControl): ValidationError
 @Component({
   selector: 'app-people',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, CrudToolbar, Filter, FormDialog, Grid, GridCell, Loader, MessageDialog, CpfPipe, PhonePipe],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, CrudToolbar, DatePicker, Dropdown, Filter, FormDialog, Grid, GridCell, Loader, MessageDialog, CpfPipe, PhonePipe],
   templateUrl: './people.html',
   styleUrl: './people.scss'
 })

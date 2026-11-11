@@ -24,4 +24,18 @@ export async function connectDatabase(): Promise<void> {
   });
 
   console.log('MongoDB connected successfully');
+
+  await ensureCollectionsAndIndexes();
+
+  console.log('MongoDB collections and indexes are ready');
+}
+
+// Creates the collections and indexes of every registered model before the API
+// accepts requests. This includes the unique index on active_visits.patientId
+// that guarantees a single active visit per patient, so a failed index build
+// stops the startup.
+async function ensureCollectionsAndIndexes(): Promise<void> {
+  await Promise.all(
+    mongoose.modelNames().map((name) => mongoose.model(name).init())
+  );
 }
