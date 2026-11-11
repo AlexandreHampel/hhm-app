@@ -62,15 +62,6 @@ tbody tr {
     outline-offset: -2px;
   }
 
-  &.disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-
-    &:hover {
-      background: none;
-    }
-  }
-
   &.selected {
     background: rgba($royal-blue, 0.16);
     box-shadow: inset 3px 0 0 $royal-blue;

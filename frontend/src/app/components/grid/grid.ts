@@ -38,8 +38,6 @@ export class Grid<T> implements OnChanges, AfterContentInit {
   // Server-side pagination: when set, rows are the current page already loaded
   // and page changes are emitted for the parent to load the requested page.
   @Input() totalItems: number | null = null;
-  // Rows that are shown but cannot be selected.
-  @Input() rowDisabled: ((row: T) => boolean) | null = null;
 
   @Output() selectedRowChange = new EventEmitter<T | null>();
   @Output() pageRequest = new EventEmitter<GridPageRequest>();
@@ -88,15 +86,7 @@ export class Grid<T> implements OnChanges, AfterContentInit {
   }
 
   toggleRow(row: T): void {
-    if (this.isDisabled(row)) {
-      return;
-    }
-
     this.selectedRowChange.emit(this.isSelected(row) ? null : row);
-  }
-
-  isDisabled(row: T): boolean {
-    return this.rowDisabled?.(row) ?? false;
   }
 
   isSelected(row: T): boolean {

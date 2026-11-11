@@ -32,12 +32,12 @@
           title="Find Patient"
           placeholder="Select a patient"
           emptyMessage="No patients found."
-          [items]="patients"
+          [items]="availablePatients"
+          [selectedLabel]="selectedPatientName"
           [columns]="patientColumns"
           [searchFields]="searchFields"
           [itemId]="personId"
-          [itemLabel]="personName"
-          [itemDisabled]="isUnavailable">
+          [itemLabel]="personName">
         </app-finder>
         <small *ngIf="hasError(visitForm.controls.patientId)" class="field-error" data-testid="visits-patient-validation-error">
           {{ visitForm.controls.patientId.hasError('patientUnavailable') ? 'This patient already has an active visit.' : 'Patient is required.' }}

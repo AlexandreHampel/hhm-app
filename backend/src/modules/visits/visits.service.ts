@@ -166,35 +166,20 @@ export class VisitsService {
       filter.patientId = patientId;
     }
 
-    const conditions: QueryFilter<Visit>[] = [];
-    const patientName = this.singleQueryValue(params.patientName, 'patientName');
-    const patientCpf = this.parseDigitsParam(params.patientCpf, 'patientCpf');
+    const professionalId = this.singleQueryValue(params.professionalId, 'professionalId');
 
-    if (patientName || patientCpf) {
-      const patientIds = await this.peopleRepository.findIds({
-        roles: 'PATIENT',
-        ...(patientName ? { name: this.containsPattern(patientName) } : {}),
-        ...(patientCpf ? { cpf: this.containsPattern(patientCpf) } : {})
-      });
+    if (professionalId !== undefined) {
+      if (!OBJECT_ID_PATTERN.test(professionalId)) {
+        throw new VisitsError('Invalid professional ID', 400);
+      }
 
-      conditions.push({ patientId: { $in: patientIds } });
-    }
-
-    const professionalName = this.singleQueryValue(params.professionalName, 'professionalName');
-
-    if (professionalName) {
-      const professionalIds = await this.peopleRepository.findIds({ name: this.containsPattern(professionalName) });
-      conditions.push({ attendingProfessionalId: { $in: professionalIds } });
+      filter.attendingProfessionalId = professionalId;
     }
 
     const chiefComplaint = this.singleQueryValue(params.chiefComplaint, 'chiefComplaint');
 
     if (chiefComplaint) {
       filter.chiefComplaint = this.containsPattern(chiefComplaint);
-    }
-
-    if (conditions.length > 0) {
-      filter.$and = conditions;
     }
 
     const admissionFrom = this.parseDateParam(params.admissionFrom, 'admissionFrom', 'start');
@@ -560,22 +545,6 @@ export class VisitsService {
     }
 
     return values;
-  }
-
-  private parseDigitsParam(value: unknown, name: string): string | undefined {
-    const text = this.singleQueryValue(value, name);
-
-    if (text === undefined) {
-      return undefined;
-    }
-
-    const digits = text.replace(/\D/g, '');
-
-    if (!digits) {
-      throw new VisitsError(`${name} must contain digits`, 400);
-    }
-
-    return digits;
   }
 
   // Case-insensitive "contains" match for user-provided text.

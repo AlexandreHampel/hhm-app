@@ -4,14 +4,17 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subscription } from 'rxjs';
-import { VISIT_STATUSES, VISIT_TYPES, Visit, VisitFilters, VisitOption, VisitStatus, VisitType, optionFor } from '../../models/visits.model';
+import { Subscription, forkJoin } from 'rxjs';
+import { Person } from '../../models/people.model';
+import { VISIT_STATUSES, VISIT_TYPES, Visit, VisitFilters, VisitOption, VisitStatus, VisitType, isProfessional, optionFor } from '../../models/visits.model';
+import { PeopleService } from '../../services/people.service';
 import { VisitsService } from '../../services/visits.service';
 import { LoaderService } from '../../services/loader.service';
 import { Grid, GridColumn, GridPageRequest } from '../../components/grid/grid';
 import { GridCell } from '../../components/grid/grid-cell';
-import { Filter, FilterField, FilterValues } from '../../components/filter/filter';
+import { Filter, FilterField, FilterFinder, FilterValues } from '../../components/filter/filter';
 import { MessageDialog } from '../../components/message-dialog/message-dialog';
+import { PATIENT_COLUMNS, PERSON_SEARCH_FIELDS, PROFESSIONAL_COLUMNS, personId, personName } from './visit-finders';
 
 @Component({
   selector: 'app-visits',
@@ -23,6 +26,7 @@ import { MessageDialog } from '../../components/message-dialog/message-dialog';
 
 export class Visits implements OnInit {
   private readonly visitsService = inject(VisitsService);
+  private readonly peopleService = inject(PeopleService);
   private readonly loaderService = inject(LoaderService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -41,10 +45,30 @@ export class Visits implements OnInit {
     { id: 'professional', header: 'Responsible Professional', value: (visit) => visit.attendingProfessional?.name ?? '—' }
   ];
 
+  // Finder items are filled in once the people lists are loaded.
+  private readonly patientFinder: FilterFinder<Person> = {
+    title: 'Find Patient',
+    items: [],
+    columns: PATIENT_COLUMNS,
+    searchFields: PERSON_SEARCH_FIELDS,
+    itemId: personId,
+    itemLabel: personName,
+    emptyMessage: 'No patients found.'
+  };
+
+  private readonly professionalFinder: FilterFinder<Person> = {
+    title: 'Find Professional',
+    items: [],
+    columns: PROFESSIONAL_COLUMNS,
+    searchFields: PERSON_SEARCH_FIELDS,
+    itemId: personId,
+    itemLabel: personName,
+    emptyMessage: 'No professionals found.'
+  };
+
   readonly filterFields: FilterField<Visit>[] = [
-    { id: 'patient-name', label: 'Patient Name', fullWidth: true },
-    { id: 'patient-cpf', label: 'Patient CPF', inputMode: 'numeric', placeholder: '000.000.000-00' },
-    { id: 'professional', label: 'Responsible Professional' },
+    { id: 'patient', label: 'Patient', type: 'finder', finder: this.patientFinder },
+    { id: 'professional', label: 'Responsible Professional', type: 'finder', finder: this.professionalFinder },
     { id: 'type', label: 'Visit Type', type: 'select', options: VISIT_TYPES },
     { id: 'status', label: 'Status', type: 'select', options: VISIT_STATUSES },
     { id: 'admission-from', label: 'Admitted From', type: 'date' },
@@ -83,6 +107,7 @@ export class Visits implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadPeople();
     this.findAll();
   }
 
@@ -165,15 +190,35 @@ export class Visits implements OnInit {
   }
 
   // Date filters are whole local days, sent to the API as exact instants.
+  private loadPeople(): void {
+    forkJoin({
+      patients: this.peopleService.findByRole('PATIENT'),
+      people: this.peopleService.findAll()
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ patients, people }) => {
+          this.patientFinder.items = patients;
+          this.professionalFinder.items = people.filter((person) => isProfessional(person));
+          this.cdr.detectChanges();
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('Find people error:', error);
+
+          this.errorMessage = this.buildErrorMessage('load patients and professionals', error);
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
   private buildFilters(): VisitFilters {
     const filter = this.activeFilter;
     const admissionFrom = filter['admission-from'];
     const admissionTo = filter['admission-to'];
 
     return {
-      patientName: filter['patient-name'],
-      patientCpf: filter['patient-cpf'],
-      professionalName: filter['professional'],
+      patientId: filter['patient'],
+      professionalId: filter['professional'],
       chiefComplaint: filter['chief-complaint'],
       type: filter['type'] as VisitType | undefined,
       status: filter['status'] as VisitStatus | undefined,

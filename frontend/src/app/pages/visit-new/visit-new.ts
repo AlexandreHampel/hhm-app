@@ -7,7 +7,7 @@ import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 import { Person } from '../../models/people.model';
-import { ActivePatient, CHIEF_COMPLAINT_MAX_LENGTH, NOTES_MAX_LENGTH, VISIT_STATUSES, VISIT_TYPES, VisitPayload, VisitType, isProfessional, optionFor } from '../../models/visits.model';
+import { ActivePatient, CHIEF_COMPLAINT_MAX_LENGTH, NOTES_MAX_LENGTH, VISIT_TYPES, VisitPayload, VisitType, isProfessional } from '../../models/visits.model';
 import { PeopleService } from '../../services/people.service';
 import { VisitsService } from '../../services/visits.service';
 import { LoaderService } from '../../services/loader.service';
@@ -17,7 +17,7 @@ import { Loader } from '../../components/loader/loader';
 import { Finder } from '../../components/finder/finder';
 import { MessageDialog } from '../../components/message-dialog/message-dialog';
 import { notFutureDateTimeValidator, requiredTrimmedValidator, toDateTimeLocal } from '../../validators/form-validators';
-import { PERSON_SEARCH_FIELDS, PROFESSIONAL_COLUMNS, patientColumns, personId, personName } from '../visits/visit-finders';
+import { PATIENT_COLUMNS, PERSON_SEARCH_FIELDS, PROFESSIONAL_COLUMNS, personId, personName } from '../visits/visit-finders';
 
 @Component({
   selector: 'app-visit-new',
@@ -44,12 +44,12 @@ export class VisitNew implements OnInit {
   readonly personName = personName;
   readonly searchFields = PERSON_SEARCH_FIELDS;
   readonly professionalColumns = PROFESSIONAL_COLUMNS;
-  readonly patientColumns = patientColumns((patient) =>
-    this.isUnavailable(patient) ? `Active visit (${this.activeStatusLabel(patient)})` : 'Available'
-  );
+  readonly patientColumns = PATIENT_COLUMNS;
 
   activeVisits = new Map<string, ActivePatient>();
   patients: Person[] = [];
+  // Patients with an active visit are not offered in the patient finder.
+  availablePatients: Person[] = [];
   professionals: Person[] = [];
   professionalOptions: Person[] = [];
 
@@ -68,7 +68,11 @@ export class VisitNew implements OnInit {
   saving = false;
   submitted = false;
 
-  readonly isUnavailable = (patient: Person): boolean => this.activeVisits.has(patient._id);
+  // Keeps the chosen name visible if the patient becomes unavailable meanwhile.
+  get selectedPatientName(): string | null {
+    const patientId = this.visitForm.controls.patientId.value;
+    return this.patients.find((patient) => patient._id === patientId)?.name ?? null;
+  }
 
   ngOnInit(): void {
     this.visitForm.controls.patientId.valueChanges
@@ -98,8 +102,8 @@ export class VisitNew implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ patients, people, activePatients }) => {
-          this.setActiveVisits(activePatients);
           this.patients = patients;
+          this.setActiveVisits(activePatients);
           this.professionals = people.filter((person) => isProfessional(person));
           this.updateProfessionalOptions();
           this.loadingOptions = false;
@@ -175,11 +179,6 @@ export class VisitNew implements OnInit {
     this.professionalOptions = this.professionals.filter((professional) => professional._id !== patientId);
   }
 
-  private activeStatusLabel(patient: Person): string {
-    const activeVisit = this.activeVisits.get(patient._id);
-    return activeVisit ? optionFor(VISIT_STATUSES, activeVisit.status).label : '';
-  }
-
   // Patients with an active visit cannot be selected. The API also rejects
   // them (409); this keeps the form consistent if the list changes meanwhile.
   private availablePatientValidator(control: AbstractControl<string>): ValidationErrors | null {
@@ -193,8 +192,6 @@ export class VisitNew implements OnInit {
       .subscribe({
         next: (activePatients) => {
           this.setActiveVisits(activePatients);
-          // New array reference so the finder refreshes the availability column.
-          this.patients = [...this.patients];
           this.cdr.detectChanges();
         },
         error: (error: HttpErrorResponse) => console.error('Find active patients error:', error)
@@ -203,6 +200,7 @@ export class VisitNew implements OnInit {
 
   private setActiveVisits(activePatients: ActivePatient[]): void {
     this.activeVisits = new Map(activePatients.map((activePatient) => [activePatient.patientId, activePatient]));
+    this.availablePatients = this.patients.filter((patient) => !this.activeVisits.has(patient._id));
     this.visitForm.controls.patientId.updateValueAndValidity();
   }
 

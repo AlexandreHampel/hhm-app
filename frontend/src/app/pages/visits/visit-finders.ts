@@ -34,6 +34,4 @@ export const PROFESSIONAL_COLUMNS: GridColumn<Person>[] = [
   }
 ];
 
-export function patientColumns(availability: (patient: Person) => string): GridColumn<Person>[] {
-  return [NAME_COLUMN, CPF_COLUMN, { id: 'availability', header: 'Availability', value: availability }];
-}
+export const PATIENT_COLUMNS: GridColumn<Person>[] = [NAME_COLUMN, CPF_COLUMN];

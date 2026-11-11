@@ -45,8 +45,23 @@
           [placeholderSelectable]="true"
           [formControlName]="field.id">
         </app-dropdown>
+        <app-finder
+          *ngIf="field.type === 'finder' && field.finder"
+          [inputId]="testIdPrefix + '-' + field.id"
+          [testIdPrefix]="testIdPrefix + '-' + field.id"
+          [title]="field.finder.title"
+          placeholder="Any"
+          [clearable]="true"
+          [items]="field.finder.items"
+          [columns]="field.finder.columns"
+          [searchFields]="field.finder.searchFields"
+          [itemId]="field.finder.itemId"
+          [itemLabel]="field.finder.itemLabel"
+          [emptyMessage]="field.finder.emptyMessage ?? 'No records found.'"
+          [formControlName]="field.id">
+        </app-finder>
         <input
-          *ngIf="field.type !== 'date' && field.type !== 'select'"
+          *ngIf="field.type !== 'date' && field.type !== 'select' && field.type !== 'finder'"
           [id]="testIdPrefix + '-' + field.id"
           [type]="field.type ?? 'text'"
           [attr.inputmode]="field.inputMode ?? null"

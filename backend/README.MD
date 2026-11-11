@@ -163,9 +163,7 @@ No `DELETE` endpoint is exposed. Visits are historical records, and the model al
 | `status` | One or more statuses, comma-separated (for example, `OPEN,IN_PROGRESS`) |
 | `type` | One or more visit types, comma-separated |
 | `patientId` | Visits of one patient |
-| `patientName` | Patient name contains the text (case-insensitive) |
-| `patientCpf` | Patient CPF contains the digits (formatting is ignored) |
-| `professionalName` | Attending professional name contains the text (case-insensitive) |
+| `professionalId` | Visits whose attending professional is this person |
 | `chiefComplaint` | Chief complaint contains the text (case-insensitive) |
 | `admissionFrom` / `admissionTo` | Inclusive admission date range. Accepts an ISO 8601 date-time with timezone, or `YYYY-MM-DD`, which is interpreted as the whole UTC day. |
 | `page` | Page number, starting at 1 (default `1`) |

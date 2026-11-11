@@ -75,9 +75,7 @@ export type VisitUpdatePayload = Omit<VisitPayload, 'patientId' | 'admissionDate
 
 export interface VisitFilters {
   patientId?: string;
-  patientName?: string;
-  patientCpf?: string;
-  professionalName?: string;
+  professionalId?: string;
   chiefComplaint?: string;
   type?: VisitType;
   status?: VisitStatus;

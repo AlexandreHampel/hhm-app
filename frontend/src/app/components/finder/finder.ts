@@ -4,7 +4,7 @@ import { ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACC
 import { MatIconModule } from '@angular/material/icon';
 import { FormDialog } from '../form-dialog/form-dialog';
 import { Grid, GridColumn } from '../grid/grid';
-import { FilterField, FilterValues, filterRows } from '../filter/filter';
+import { FilterField, FilterValues, filterRows } from '../filter/filter-fields';
 
 export const FINDER_MIN_SEARCH_LENGTH = 3;
 
@@ -30,7 +30,6 @@ export class Finder<T> implements ControlValueAccessor, OnChanges {
   @Input({ required: true }) searchFields: FilterField<T>[] = [];
   @Input({ required: true }) itemId!: (item: T) => string;
   @Input({ required: true }) itemLabel!: (item: T) => string;
-  @Input() itemDisabled: ((item: T) => boolean) | null = null;
   @Input() inputId: string | null = null;
   @Input() placeholder = '';
   @Input() emptyMessage = 'No records found.';
@@ -125,7 +124,7 @@ export class Finder<T> implements ControlValueAccessor, OnChanges {
   confirm(): void {
     this.submitted = true;
 
-    if (!this.selectedItem || this.isItemDisabled(this.selectedItem)) {
+    if (!this.selectedItem) {
       return;
     }
 
@@ -139,8 +138,6 @@ export class Finder<T> implements ControlValueAccessor, OnChanges {
     this.onChange(this.value);
     this.onTouched();
   }
-
-  isItemDisabled = (item: T): boolean => this.itemDisabled?.(item) ?? false;
 
   writeValue(value: string | null): void {
     this.value = value ?? '';
